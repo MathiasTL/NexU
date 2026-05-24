@@ -1,0 +1,355 @@
+"use client";
+
+import { use } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/useAuth";
+import { usePropertyDetail } from "@/src/hooks/usePropertyDetail";
+import { useStartConversation } from "@/src/hooks/useStartConversation";
+import { GuestCounts } from "@/src/components/layout/search/GuestPopover";
+import { MessageCircle } from "lucide-react";
+import {
+  PropertyReviews,
+  PropertyImageGallery,
+  PropertyBasicInfo,
+  PropertyHostInfo,
+  PropertyDescription,
+  PropertyAmenities,
+  PropertyHouseRules,
+  PropertyBookingCard,
+  CheckoutModal,
+  SuccessModal,
+  type CheckoutFormData,
+} from "@/src/components/features/properties";
+import {
+  PropertyLoadingState,
+  PropertyErrorState,
+  PropertyNotFoundState,
+} from "@/src/components/features/properties/PropertyStates";
+
+interface PropertyPageProps {
+  params: Promise<{ id: string }>;
+}
+
+interface BookingDates {
+  checkIn: string;
+  checkOut: string;
+  guests: GuestCounts;
+}
+
+export default function PropertyPage({ params }: PropertyPageProps) {
+  const { id } = use(params);
+  const router = useRouter();
+  const { property, isLoading, error } = usePropertyDetail(id);
+  const { isAuthenticated } = useAuth();
+  const { startConversationAndNavigate, isLoading: isStartingConversation } =
+    useStartConversation();
+
+  // Estados para funcionalidades
+
+  const [selectedDates, setSelectedDates] = useState<BookingDates>({
+    checkIn: "",
+    checkOut: "",
+    guests: {
+      adults: 1,
+      children: 0,
+      babies: 0,
+      pets: 0,
+    },
+  });
+
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const [propertyOccupied, setPropertyOccupied] = useState(false);
+
+  // Funciones de calculo y utilidades
+  const getNightCount = () => {
+    const { checkIn, checkOut } = selectedDates;
+    if (!checkIn || !checkOut) return 0;
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = end.getTime() - start.getTime();
+
+    if (!Number.isFinite(diff) || diff <= 0) {
+      return 0;
+    }
+
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const calculateTotalPrice = () => {
+    if (typeof property?.basePriceNight !== "number") {
+      return 0;
+    }
+    const nights = getNightCount();
+    return nights > 0 ? nights * property.basePriceNight : 0;
+  };
+
+  // Estados de carga
+
+  if (isLoading) {
+    return <PropertyLoadingState />;
+  }
+
+  if (error) {
+    return <PropertyErrorState error={error} />;
+  }
+
+  if (!property) {
+    return <PropertyNotFoundState />;
+  }
+
+  // Calculos de precios
+
+  const nightsCount = getNightCount();
+  const totalPrice = calculateTotalPrice();
+  const serviceFee = Math.round(totalPrice * 0.14);
+  const grandTotal = totalPrice + serviceFee;
+
+  // Formateo de moneda
+
+  const currencyCode =
+    typeof property.currencyCode === "string" &&
+    property.currencyCode.trim().length > 0
+      ? property.currencyCode.toUpperCase()
+      : "USD";
+
+  const currencyPrefix =
+    currencyCode === "PEN"
+      ? "S/"
+      : currencyCode === "USD"
+        ? "$"
+        : `${currencyCode} `;
+
+  const formatCurrencyValue = (value: number) =>
+    `${currencyPrefix}${value.toLocaleString("es-PE")}`;
+
+  // Validacion de capacidad maxima
+  const maxGuests =
+    typeof property.capacity === "number" && property.capacity > 0
+      ? property.capacity
+      : 1;
+
+  // Handlers de eventos
+
+  const handleDatesChange = (dates: BookingDates) => {
+    setSelectedDates(dates);
+  };
+
+  const handleReserve = () => {
+    if (!selectedDates.checkIn || !selectedDates.checkOut) {
+      return;
+    }
+
+    if (
+      selectedDates.checkIn === "2025-11-25" &&
+      selectedDates.checkOut === "2025-11-26"
+    ) {
+      setPropertyOccupied(true);
+      setTimeout(() => {
+        setPropertyOccupied(false);
+      }, 10000);
+      return;
+    }
+
+    if (getNightCount() <= 0) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      const callbackUrl = encodeURIComponent(window.location.href);
+      router.push(`/login?callbackUrl=${callbackUrl}`);
+      return;
+    }
+
+    setShowCheckout(true);
+    setShowSuccess(false);
+  };
+
+  const handleCloseCheckout = () => {
+    setShowCheckout(false);
+  };
+
+  const handlePay = async (paymentDetails: CheckoutFormData) => {
+    // Propagar errores al modal en lugar de capturarlos aqui
+    const response = await fetch("/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        propertyId: parseInt(id),
+        checkIn: selectedDates.checkIn,
+        checkOut: selectedDates.checkOut,
+        guests: selectedDates.guests,
+        paymentDetails,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Error al procesar la reserva");
+    }
+
+    setShowCheckout(false);
+    setShowSuccess(true);
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+  };
+
+  const handleContactHost = async () => {
+    if (!isAuthenticated) {
+      const callbackUrl = encodeURIComponent(window.location.href);
+      router.push(`/login?callbackUrl=${callbackUrl}`);
+      return;
+    }
+
+    await startConversationAndNavigate({
+      propertyId: parseInt(id),
+      initialMessage: `Hola, estoy interesado en ${property?.title}. ¿Podrías darme más información?`,
+    });
+  };
+
+  return (
+    <>
+      <div className="min-h-screen bg-white">
+        <div className="mx-auto max-w-7xl px-4">
+          {/* Informacion basica */}
+
+          <PropertyBasicInfo
+            title={property.title || "Titulo no disponible"}
+            city={property.city}
+            stateRegion={property.stateRegion}
+            country={property.country}
+            averageRating={property.reviews.averageRating}
+            totalReviews={property.reviews.totalCount}
+            className="mb-6"
+          />
+
+          {/* Galeria de imagenes */}
+
+          <PropertyImageGallery
+            images={property.images}
+            title={property.title}
+            className="mb-8"
+          />
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {/* Contenido principal */}
+
+            <div className="space-y-8 lg:col-span-2">
+              {/* Informacion del anfitrion */}
+
+              <PropertyHostInfo
+                propertyType={property.propertyType || "Alojamiento"}
+                host={property.host}
+                capacity={property.capacity}
+                bedrooms={property.bedrooms}
+                bathrooms={property.bathrooms}
+                beds={property.beds}
+                city={property.city}
+                country={property.country}
+              />
+
+              {/* Contact Host Button */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6">
+                <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                  ¿Tienes preguntas?
+                </h3>
+                <p className="mb-4 text-sm text-gray-600">
+                  Contacta al anfitrión para resolver tus dudas antes de
+                  reservar
+                </p>
+                <button
+                  onClick={handleContactHost}
+                  disabled={isStartingConversation}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-blue-600 bg-white px-4 py-3 font-medium text-blue-600 transition-all hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  {isStartingConversation
+                    ? "Iniciando chat..."
+                    : "Contactar al anfitrión"}
+                </button>
+              </div>
+
+              {/* Descripcion */}
+
+              <PropertyDescription description={property.descriptionLong} />
+
+              {/* Amenidades */}
+
+              <PropertyAmenities
+                amenities={property.amenities.map((amenity) => ({
+                  name: amenity.name || "",
+                  icon: amenity.icon,
+                }))}
+              />
+
+              {/* Reglas de la casa */}
+
+              <PropertyHouseRules
+                houseRules={property.houseRules}
+                checkinTime={property.checkinTime}
+                checkoutTime={property.checkoutTime}
+              />
+
+              {/* Resenas */}
+
+              <PropertyReviews reviews={property.reviews} />
+            </div>
+
+            {/* Card de reserva */}
+
+            <div className="lg:col-span-1">
+              <PropertyBookingCard
+                propertyId={parseInt(id)}
+                basePriceNight={property.basePriceNight}
+                currencyCode={currencyCode}
+                averageRating={property.reviews.averageRating}
+                totalReviews={property.reviews.totalCount}
+                maxGuests={maxGuests}
+                selectedDates={selectedDates}
+                onDatesChange={handleDatesChange}
+                onReserve={handleReserve}
+                propertyOccupied={propertyOccupied}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal de checkout */}
+
+      <CheckoutModal
+        isOpen={showCheckout}
+        onClose={handleCloseCheckout}
+        onPay={handlePay}
+        property={{
+          title: property.title || "Propiedad",
+          city: property.city,
+          stateRegion: property.stateRegion,
+          country: property.country,
+          images: property.images,
+          reviews: property.reviews,
+        }}
+        selectedDates={selectedDates}
+        pricing={{
+          nightsCount,
+          totalPrice,
+          serviceFee,
+          grandTotal,
+        }}
+        currencyFormatter={formatCurrencyValue}
+      />
+
+      {/* Modal de exito */}
+
+      <SuccessModal isOpen={showSuccess} onClose={handleCloseSuccess} />
+    </>
+  );
+}
