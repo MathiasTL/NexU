@@ -22,9 +22,9 @@ export const Navbar = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-            <span className="text-sm font-bold text-white">S</span>
+            <span className="text-sm font-bold text-white">N</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">Smart</span>
+          <span className="text-lg font-bold text-gray-900">NexU</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

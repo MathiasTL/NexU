@@ -2,7 +2,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '@/features/auth/services/auth.service';
 export const AuthContext = createContext(null);
-const STORAGE_KEY = 'smart_user';
+const STORAGE_KEY = 'nexu_user';
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);

@@ -13,7 +13,7 @@ interface AuthState {
 
 export const AuthContext = createContext<AuthState | null>(null)
 
-const STORAGE_KEY = 'smart_user'
+const STORAGE_KEY = 'nexu_user'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null)

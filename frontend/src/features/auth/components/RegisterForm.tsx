@@ -85,7 +85,7 @@ export const RegisterForm = () => {
         minLength={6}
       />
       <div className="flex flex-col gap-1">
-        <label htmlFor="role" className="text-sm font-medium text-gray-700">¿Cómo quieres usar Smart?</label>
+        <label htmlFor="role" className="text-sm font-medium text-gray-700">¿Cómo quieres usar NexU?</label>
         <select
           id="role"
           name="role"
