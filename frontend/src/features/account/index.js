@@ -1,5 +1,0 @@
-export { ProfilePage } from './pages/ProfilePage';
-export { PersonalInfoPage } from './pages/PersonalInfoPage';
-export { NotificationsPage } from './pages/NotificationsPage';
-export { MessagesPage } from './pages/MessagesPage';
-export { accountService } from './services/account.service';

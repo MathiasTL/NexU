@@ -1,5 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { StepHeader } from '@/shared/components/ui/StepHeader';
-import { WizardNav } from './WizardNav';
-const MAX = 60;
-export const Step6Title = ({ draft, update, onNext, onPrev }) => (_jsxs("div", { children: [_jsx(StepHeader, { current: 6, total: 9, title: "Dale un t\u00EDtulo a tu propiedad", subtitle: "Un t\u00EDtulo atractivo es lo primero que ver\u00E1n los hu\u00E9spedes." }), _jsxs("div", { className: "flex flex-col gap-2", children: [_jsx("textarea", { value: draft.title, onChange: e => update({ title: e.target.value.slice(0, MAX) }), className: "h-24 w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-lg font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20", placeholder: "Ej: Penthouse con vista al mar en Miraflores" }), _jsxs("p", { className: "text-right text-xs text-gray-400", children: [draft.title.length, "/", MAX] })] }), _jsx(WizardNav, { onPrev: onPrev, onNext: onNext, canNext: draft.title.trim().length > 5 })] }));
