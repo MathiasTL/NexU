@@ -1,0 +1,3 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { cn } from '@/shared/utils/cn';
+export const EmptyState = ({ icon, title, description, action, className }) => (_jsxs("div", { className: cn('flex flex-col items-center justify-center py-16 text-center', className), children: [icon && _jsx("div", { className: "mb-4 text-gray-300", children: icon }), _jsx("h3", { className: "text-lg font-semibold text-gray-900", children: title }), description && _jsx("p", { className: "mt-1 text-sm text-gray-500", children: description }), action && _jsx("div", { className: "mt-4", children: action })] }));

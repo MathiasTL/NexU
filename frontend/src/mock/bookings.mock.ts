@@ -1,0 +1,131 @@
+export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
+
+export interface Booking {
+  id: number
+  propertyId: number
+  tenantId: number
+  hostId: number
+  checkinDate: string
+  checkoutDate: string
+  guestCount: number
+  nightCount: number
+  pricePerNight: number
+  serviceFee: number
+  totalAmount: number
+  currency: 'PEN'
+  status: BookingStatus
+  guestMessage: string | null
+  hostNote: string | null
+  createdAt: string
+}
+
+export const BOOKINGS_MOCK: Booking[] = [
+  {
+    id: 1,
+    propertyId: 1,
+    tenantId: 1,
+    hostId: 2,
+    checkinDate: '2026-07-10',
+    checkoutDate: '2026-07-15',
+    guestCount: 2,
+    nightCount: 5,
+    pricePerNight: 320,
+    serviceFee: 224,
+    totalAmount: 1824,
+    currency: 'PEN',
+    status: 'confirmed',
+    guestMessage: 'Llegaremos alrededor de las 4pm. ¿Puede alguien recibirnos?',
+    hostNote: 'Bienvenidos, dejaré las llaves en recepción.',
+    createdAt: '2026-05-20',
+  },
+  {
+    id: 2,
+    propertyId: 4,
+    tenantId: 1,
+    hostId: 3,
+    checkinDate: '2026-08-01',
+    checkoutDate: '2026-08-08',
+    guestCount: 6,
+    nightCount: 7,
+    pricePerNight: 350,
+    serviceFee: 343,
+    totalAmount: 2793,
+    currency: 'PEN',
+    status: 'confirmed',
+    guestMessage: 'Somos una familia con dos niños pequeños.',
+    hostNote: null,
+    createdAt: '2026-05-15',
+  },
+  {
+    id: 3,
+    propertyId: 2,
+    tenantId: 1,
+    hostId: 3,
+    checkinDate: '2026-06-10',
+    checkoutDate: '2026-06-13',
+    guestCount: 2,
+    nightCount: 3,
+    pricePerNight: 180,
+    serviceFee: 76,
+    totalAmount: 616,
+    currency: 'PEN',
+    status: 'pending',
+    guestMessage: 'Primera vez en Barranco, muy emocionados.',
+    hostNote: null,
+    createdAt: '2026-05-25',
+  },
+  {
+    id: 4,
+    propertyId: 3,
+    tenantId: 1,
+    hostId: 2,
+    checkinDate: '2026-03-05',
+    checkoutDate: '2026-03-08',
+    guestCount: 1,
+    nightCount: 3,
+    pricePerNight: 280,
+    serviceFee: 118,
+    totalAmount: 958,
+    currency: 'PEN',
+    status: 'completed',
+    guestMessage: 'Viaje de trabajo.',
+    hostNote: 'Excelente huésped, muy ordenado.',
+    createdAt: '2026-02-10',
+  },
+  {
+    id: 5,
+    propertyId: 5,
+    tenantId: 1,
+    hostId: 2,
+    checkinDate: '2026-02-14',
+    checkoutDate: '2026-02-17',
+    guestCount: 2,
+    nightCount: 3,
+    pricePerNight: 110,
+    serviceFee: 46,
+    totalAmount: 376,
+    currency: 'PEN',
+    status: 'completed',
+    guestMessage: 'Escapada romántica de San Valentín.',
+    hostNote: null,
+    createdAt: '2026-01-20',
+  },
+  {
+    id: 6,
+    propertyId: 6,
+    tenantId: 1,
+    hostId: 3,
+    checkinDate: '2026-04-20',
+    checkoutDate: '2026-04-23',
+    guestCount: 3,
+    nightCount: 3,
+    pricePerNight: 150,
+    serviceFee: 63,
+    totalAmount: 513,
+    currency: 'PEN',
+    status: 'cancelled',
+    guestMessage: 'Tuve que cancelar por motivos de trabajo.',
+    hostNote: null,
+    createdAt: '2026-04-01',
+  },
+]

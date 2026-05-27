@@ -1,0 +1,10 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Link } from 'react-router-dom';
+import { Calendar, Users } from 'lucide-react';
+import { BookingStatusBadge } from './BookingStatusBadge';
+import { formatDate, formatCurrency, formatNights } from '@/shared/utils/formatters';
+import { PROPERTIES_MOCK } from '@/mock/properties.mock';
+export const BookingCard = ({ booking, onSelect }) => {
+    const property = PROPERTIES_MOCK.find(p => p.id === booking.propertyId);
+    return (_jsx("div", { className: "overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md cursor-pointer", onClick: () => onSelect?.(booking), children: _jsxs("div", { className: "flex gap-4 p-4", children: [property && (_jsx("img", { src: property.images[0], alt: property.title, className: "h-20 w-24 shrink-0 rounded-xl object-cover" })), _jsxs("div", { className: "flex-1 min-w-0", children: [_jsxs("div", { className: "mb-1 flex items-start justify-between gap-2", children: [_jsx(Link, { to: `/properties/${booking.propertyId}`, onClick: e => e.stopPropagation(), className: "font-semibold text-gray-900 hover:text-blue-600 line-clamp-1", children: property?.title ?? `Propiedad #${booking.propertyId}` }), _jsx(BookingStatusBadge, { status: booking.status })] }), _jsxs("div", { className: "flex flex-wrap gap-3 text-xs text-gray-500", children: [_jsxs("span", { className: "flex items-center gap-1", children: [_jsx(Calendar, { className: "h-3.5 w-3.5" }), formatDate(booking.checkinDate), " \u2192 ", formatDate(booking.checkoutDate)] }), _jsxs("span", { className: "flex items-center gap-1", children: [_jsx(Users, { className: "h-3.5 w-3.5" }), booking.guestCount, " hu\u00E9spedes"] })] }), _jsxs("div", { className: "mt-2 flex items-center justify-between", children: [_jsx("span", { className: "text-xs text-gray-400", children: formatNights(booking.nightCount) }), _jsx("span", { className: "font-semibold text-gray-900", children: formatCurrency(booking.totalAmount) })] })] })] }) }));
+};

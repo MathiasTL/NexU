@@ -1,0 +1,44 @@
+# ── Dependencias ──────────────────────────────
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# ── Builds ────────────────────────────────────
+.next/
+dist/
+build/
+out/
+*.egg-info/
+
+# ── Variables de entorno (NUNCA al repo) ──────
+.env
+.env.local
+.env.*.local
+*.env
+
+# ── Logs ──────────────────────────────────────
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+*.log
+
+# ── OS ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editores ──────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── Python ────────────────────────────────────
+*.pyo
+.mypy_cache/
+.ruff_cache/
+
+# ── Misc ──────────────────────────────────────
+*.tsbuildinfo
+.turbo/

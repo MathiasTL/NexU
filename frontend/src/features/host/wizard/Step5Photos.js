@@ -1,0 +1,5 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Camera } from 'lucide-react';
+import { StepHeader } from '@/shared/components/ui/StepHeader';
+import { WizardNav } from './WizardNav';
+export const Step5Photos = ({ onNext, onPrev }) => (_jsxs("div", { children: [_jsx(StepHeader, { current: 5, total: 9, title: "A\u00F1ade fotos de tu propiedad", subtitle: "Las fotos son clave para atraer hu\u00E9spedes." }), _jsxs("div", { className: "flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-gray-200 py-16", children: [_jsx("div", { className: "rounded-full bg-gray-100 p-4", children: _jsx(Camera, { className: "h-8 w-8 text-gray-400" }) }), _jsxs("div", { className: "text-center", children: [_jsx("p", { className: "font-medium text-gray-900", children: "Sube tus fotos aqu\u00ED" }), _jsx("p", { className: "mt-1 text-sm text-gray-500", children: "En esta versi\u00F3n demo, se asignar\u00E1 una imagen autom\u00E1ticamente" })] })] }), _jsx(WizardNav, { onPrev: onPrev, onNext: onNext, nextLabel: "Continuar sin fotos" })] }));
