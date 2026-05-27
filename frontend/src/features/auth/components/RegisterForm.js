@@ -1,41 +1,50 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GraduationCap, Building2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/core/auth/useAuth';
 import { authService } from '../services/auth.service';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
+import { PasswordInput } from '@/shared/components/ui/PasswordInput';
+import { GoogleButton } from '@/shared/components/ui/GoogleButton';
 import { ErrorMessage } from '@/shared/components/feedback/ErrorMessage';
-export const RegisterForm = () => {
+import { cn } from '@/shared/utils/cn';
+export const RegisterForm = ({ role, onChangeRole }) => {
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        role: 'tenant',
-    });
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const handleChange = (e) => {
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!acceptedTerms) {
+            setError('Debes aceptar los términos y condiciones para continuar');
+            return;
+        }
         setError('');
         setLoading(true);
         try {
-            await authService.register(form);
-            await login(form.email, form.password);
-            navigate('/', { replace: true });
+            const parts = fullName.trim().split(' ');
+            const firstName = parts[0] ?? fullName;
+            const lastName = parts.slice(1).join(' ') || firstName;
+            await authService.register({ firstName, lastName, email, password, role });
+            await login(email, password);
+            navigate(role === 'host' ? '/host/dashboard' : '/', { replace: true });
         }
         catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al registrarse');
+            setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
         }
         finally {
             setLoading(false);
         }
     };
-    return (_jsxs("form", { onSubmit: handleSubmit, className: "flex flex-col gap-4", children: [error && _jsx(ErrorMessage, { message: error }), _jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsx(Input, { id: "firstName", name: "firstName", label: "Nombre", value: form.firstName, onChange: handleChange, placeholder: "Mar\u00EDa", required: true }), _jsx(Input, { id: "lastName", name: "lastName", label: "Apellido", value: form.lastName, onChange: handleChange, placeholder: "Gonz\u00E1lez", required: true })] }), _jsx(Input, { id: "email", name: "email", label: "Correo electr\u00F3nico", type: "email", value: form.email, onChange: handleChange, placeholder: "tu@email.com", required: true, autoComplete: "email" }), _jsx(Input, { id: "password", name: "password", label: "Contrase\u00F1a", type: "password", value: form.password, onChange: handleChange, placeholder: "M\u00EDnimo 6 caracteres", required: true, minLength: 6 }), _jsxs("div", { className: "flex flex-col gap-1", children: [_jsx("label", { htmlFor: "role", className: "text-sm font-medium text-gray-700", children: "\u00BFC\u00F3mo quieres usar NexU?" }), _jsxs("select", { id: "role", name: "role", value: form.role, onChange: handleChange, className: "rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20", children: [_jsx("option", { value: "tenant", children: "Buscar propiedades (Hu\u00E9sped)" }), _jsx("option", { value: "host", children: "Publicar propiedades (Anfitri\u00F3n)" })] })] }), _jsx(Button, { type: "submit", loading: loading, size: "lg", className: "w-full", children: "Crear cuenta" }), _jsxs("p", { className: "text-center text-sm text-gray-500", children: ["\u00BFYa tienes cuenta?", ' ', _jsx(Link, { to: "/login", className: "font-medium text-blue-600 hover:underline", children: "Inicia sesi\u00F3n" })] })] }));
+    const RoleIcon = role === 'tenant' ? GraduationCap : Building2;
+    const roleLabel = role === 'tenant' ? 'Estudiante' : 'Propietario';
+    return (_jsxs("div", { className: "flex flex-col gap-5", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsxs("span", { className: cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold', role === 'tenant'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-emerald-100 text-emerald-700'), children: [_jsx(RoleIcon, { className: "h-3.5 w-3.5" }), roleLabel] }), _jsxs("button", { type: "button", onClick: onChangeRole, className: "flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-blue-600", children: [_jsx(ArrowLeft, { className: "h-3 w-3" }), "Cambiar rol"] })] }), _jsx("h2", { className: "text-xl font-bold text-gray-900", children: "Crea tu cuenta" }), error && _jsx(ErrorMessage, { message: error }), _jsxs("form", { onSubmit: handleSubmit, className: "flex flex-col gap-4", children: [_jsx(Input, { id: "fullName", label: "Nombre completo", value: fullName, onChange: e => setFullName(e.target.value), placeholder: "Juan P\u00E9rez", required: true, autoComplete: "name" }), _jsx(Input, { id: "reg-email", label: "Correo electr\u00F3nico", type: "email", value: email, onChange: e => setEmail(e.target.value), placeholder: "juan@universidad.edu.pe", required: true, autoComplete: "email" }), _jsx(PasswordInput, { id: "reg-password", label: "Contrase\u00F1a", value: password, onChange: e => setPassword(e.target.value), placeholder: "M\u00EDnimo 6 caracteres", required: true, autoComplete: "new-password", showStrength: true }), _jsxs("label", { className: "flex cursor-pointer items-start gap-2.5", children: [_jsx("input", { type: "checkbox", checked: acceptedTerms, onChange: e => setAcceptedTerms(e.target.checked), className: "mt-0.5 h-4 w-4 rounded border-gray-300 accent-blue-600" }), _jsxs("span", { className: "text-xs leading-relaxed text-gray-600", children: ["Acepto los", ' ', _jsx(Link, { to: "#", className: "font-medium text-blue-600 hover:underline", children: "t\u00E9rminos y condiciones" }), ' ', "y la", ' ', _jsx(Link, { to: "#", className: "font-medium text-blue-600 hover:underline", children: "pol\u00EDtica de privacidad" })] })] }), _jsx(Button, { type: "submit", loading: loading, size: "lg", className: "w-full", children: "Crear cuenta" }), _jsxs("div", { className: "flex items-center gap-3", children: [_jsx("div", { className: "flex-1 border-t border-gray-200" }), _jsx("span", { className: "text-xs text-gray-400", children: "o contin\u00FAa con" }), _jsx("div", { className: "flex-1 border-t border-gray-200" })] }), _jsx(GoogleButton, {})] })] }));
 };

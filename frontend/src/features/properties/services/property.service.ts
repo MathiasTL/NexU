@@ -23,15 +23,35 @@ export const propertyService = {
     await delay()
     return PROPERTIES_MOCK.filter(p => {
       if (p.status !== 'active') return false
-      if (filters.query && !p.title.toLowerCase().includes(filters.query.toLowerCase()) && !p.district.toLowerCase().includes(filters.query.toLowerCase())) return false
-      if (filters.district && !p.district.toLowerCase().includes(filters.district.toLowerCase())) return false
+
+      if (
+        filters.query &&
+        !p.title.toLowerCase().includes(filters.query.toLowerCase()) &&
+        !p.district.toLowerCase().includes(filters.query.toLowerCase())
+      )
+        return false
+
+      if (filters.district && !p.district.toLowerCase().includes(filters.district.toLowerCase()))
+        return false
+
       if (filters.maxPrice && p.pricePerNight > filters.maxPrice) return false
       if (filters.minPrice && p.pricePerNight < filters.minPrice) return false
       if (filters.capacity && p.capacity < filters.capacity) return false
+
       if (filters.amenities?.length) {
-        const hasAll = filters.amenities.every(a => p.amenities.includes(a))
-        if (!hasAll) return false
+        if (!filters.amenities.every(a => p.amenities.includes(a))) return false
       }
+
+      if (filters.bedrooms != null && p.bedrooms < filters.bedrooms) return false
+      if (filters.bathrooms != null && p.bathrooms < filters.bathrooms) return false
+
+      if (filters.quickFilter === 'individual' && (p.capacity > 2 || p.bedrooms > 1))
+        return false
+      if (filters.quickFilter === 'shared' && p.capacity <= 2 && p.bedrooms <= 1)
+        return false
+      if (filters.quickFilter === 'petFriendly' && !p.amenities.includes('PETS_ALLOWED'))
+        return false
+
       return true
     })
   },

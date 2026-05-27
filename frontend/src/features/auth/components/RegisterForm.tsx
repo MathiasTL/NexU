@@ -1,111 +1,147 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { GraduationCap, Building2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/core/auth/useAuth'
 import { authService } from '../services/auth.service'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
+import { PasswordInput } from '@/shared/components/ui/PasswordInput'
+import { GoogleButton } from '@/shared/components/ui/GoogleButton'
 import { ErrorMessage } from '@/shared/components/feedback/ErrorMessage'
+import { cn } from '@/shared/utils/cn'
 
-export const RegisterForm = () => {
+interface RegisterFormProps {
+  role: 'tenant' | 'host'
+  onChangeRole: () => void
+}
+
+export const RegisterForm = ({ role, onChangeRole }: RegisterFormProps) => {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    role: 'tenant' as 'tenant' | 'host',
-  })
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!acceptedTerms) {
+      setError('Debes aceptar los términos y condiciones para continuar')
+      return
+    }
     setError('')
     setLoading(true)
     try {
-      await authService.register(form)
-      await login(form.email, form.password)
-      navigate('/', { replace: true })
+      const parts = fullName.trim().split(' ')
+      const firstName = parts[0] ?? fullName
+      const lastName = parts.slice(1).join(' ') || firstName
+      await authService.register({ firstName, lastName, email, password, role })
+      await login(email, password)
+      navigate(role === 'host' ? '/host/dashboard' : '/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrarse')
+      setError(err instanceof Error ? err.message : 'Error al crear la cuenta')
     } finally {
       setLoading(false)
     }
   }
 
+  const RoleIcon = role === 'tenant' ? GraduationCap : Building2
+  const roleLabel = role === 'tenant' ? 'Estudiante' : 'Propietario'
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && <ErrorMessage message={error} />}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          id="firstName"
-          name="firstName"
-          label="Nombre"
-          value={form.firstName}
-          onChange={handleChange}
-          placeholder="María"
-          required
-        />
-        <Input
-          id="lastName"
-          name="lastName"
-          label="Apellido"
-          value={form.lastName}
-          onChange={handleChange}
-          placeholder="González"
-          required
-        />
-      </div>
-      <Input
-        id="email"
-        name="email"
-        label="Correo electrónico"
-        type="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="tu@email.com"
-        required
-        autoComplete="email"
-      />
-      <Input
-        id="password"
-        name="password"
-        label="Contraseña"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-        placeholder="Mínimo 6 caracteres"
-        required
-        minLength={6}
-      />
-      <div className="flex flex-col gap-1">
-        <label htmlFor="role" className="text-sm font-medium text-gray-700">¿Cómo quieres usar NexU?</label>
-        <select
-          id="role"
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+    <div className="flex flex-col gap-5">
+      {/* Step indicator */}
+      <div className="flex items-center justify-between">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold',
+            role === 'tenant'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-emerald-100 text-emerald-700',
+          )}
         >
-          <option value="tenant">Buscar propiedades (Huésped)</option>
-          <option value="host">Publicar propiedades (Anfitrión)</option>
-        </select>
+          <RoleIcon className="h-3.5 w-3.5" />
+          {roleLabel}
+        </span>
+        <button
+          type="button"
+          onClick={onChangeRole}
+          className="flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-blue-600"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Cambiar rol
+        </button>
       </div>
-      <Button type="submit" loading={loading} size="lg" className="w-full">
-        Crear cuenta
-      </Button>
-      <p className="text-center text-sm text-gray-500">
-        ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="font-medium text-blue-600 hover:underline">
-          Inicia sesión
-        </Link>
-      </p>
-    </form>
+
+      <h2 className="text-xl font-bold text-gray-900">Crea tu cuenta</h2>
+
+      {error && <ErrorMessage message={error} />}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          id="fullName"
+          label="Nombre completo"
+          value={fullName}
+          onChange={e => setFullName(e.target.value)}
+          placeholder="Juan Pérez"
+          required
+          autoComplete="name"
+        />
+        <Input
+          id="reg-email"
+          label="Correo electrónico"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="juan@universidad.edu.pe"
+          required
+          autoComplete="email"
+        />
+        <PasswordInput
+          id="reg-password"
+          label="Contraseña"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="Mínimo 6 caracteres"
+          required
+          autoComplete="new-password"
+          showStrength
+        />
+
+        <label className="flex cursor-pointer items-start gap-2.5">
+          <input
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={e => setAcceptedTerms(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-blue-600"
+          />
+          <span className="text-xs leading-relaxed text-gray-600">
+            Acepto los{' '}
+            <Link to="#" className="font-medium text-blue-600 hover:underline">
+              términos y condiciones
+            </Link>{' '}
+            y la{' '}
+            <Link to="#" className="font-medium text-blue-600 hover:underline">
+              política de privacidad
+            </Link>
+          </span>
+        </label>
+
+        <Button type="submit" loading={loading} size="lg" className="w-full">
+          Crear cuenta
+        </Button>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 border-t border-gray-200" />
+          <span className="text-xs text-gray-400">o continúa con</span>
+          <div className="flex-1 border-t border-gray-200" />
+        </div>
+
+        <GoogleButton />
+      </form>
+    </div>
   )
 }

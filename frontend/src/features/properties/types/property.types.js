@@ -1,1 +1,15 @@
-export {};
+export const DEFAULT_ADVANCED_FILTERS = {
+    propertyType: '',
+    bedrooms: null,
+    bathrooms: null,
+    university: '',
+    travelMinutes: null,
+    sleepSchedule: '',
+    noiseLevel: '',
+    petsAllowed: null,
+    cleaningLevel: '',
+    studyHabits: '',
+    roommateCount: null,
+    maxPrice: null,
+    servicesIncluded: [],
+};
