@@ -1,36 +1,55 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/core/auth/useAuth'
 import { authService } from '../services/auth.service'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
+import { PasswordInput } from '@/shared/components/ui/PasswordInput'
+import { GoogleButton } from '@/shared/components/ui/GoogleButton'
 import { ErrorMessage } from '@/shared/components/feedback/ErrorMessage'
+import { cn } from '@/shared/utils/cn'
 
-export const RegisterForm = () => {
+type UserRole = 'tenant' | 'host'
+
+interface RegisterFormProps {
+  role: UserRole
+  onChangeRole: () => void
+}
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  tenant: 'Estudiante',
+  host: 'Propietario',
+}
+
+export const RegisterForm = ({ role, onChangeRole }: RegisterFormProps) => {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    role: 'tenant' as 'tenant' | 'host',
-  })
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!acceptedTerms) {
+      setError('Debes aceptar los términos y condiciones para continuar.')
+      return
+    }
     setError('')
     setLoading(true)
     try {
-      await authService.register(form)
-      await login(form.email, form.password)
+      const [firstName, ...rest] = fullName.trim().split(' ')
+      await authService.register({
+        firstName: firstName ?? '',
+        lastName: rest.join(' ') || '',
+        email,
+        password,
+        role,
+      })
+      await login(email, password)
       navigate('/', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrarse')
@@ -41,71 +60,94 @@ export const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && <ErrorMessage message={error} />}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          id="firstName"
-          name="firstName"
-          label="Nombre"
-          value={form.firstName}
-          onChange={handleChange}
-          placeholder="María"
-          required
-        />
-        <Input
-          id="lastName"
-          name="lastName"
-          label="Apellido"
-          value={form.lastName}
-          onChange={handleChange}
-          placeholder="González"
-          required
-        />
+      {/* Role badge + change role */}
+      <div className="flex items-center justify-between">
+        <span
+          className={cn(
+            'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
+            role === 'tenant'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-emerald-100 text-emerald-700',
+          )}
+        >
+          {ROLE_LABELS[role]}
+        </span>
+        <button
+          type="button"
+          onClick={onChangeRole}
+          className="text-xs font-medium text-gray-500 hover:text-blue-600 hover:underline"
+        >
+          Cambiar rol
+        </button>
       </div>
+
+      {error && <ErrorMessage message={error} />}
+
       <Input
-        id="email"
-        name="email"
+        id="fullName"
+        label="Nombre completo"
+        value={fullName}
+        onChange={e => setFullName(e.target.value)}
+        placeholder="Juan Pérez"
+        required
+        autoComplete="name"
+      />
+
+      <Input
+        id="reg-email"
         label="Correo electrónico"
         type="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="tu@email.com"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        placeholder="juan@universidad.edu.pe"
         required
         autoComplete="email"
       />
-      <Input
-        id="password"
-        name="password"
+
+      <PasswordInput
+        id="reg-password"
         label="Contraseña"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-        placeholder="Mínimo 6 caracteres"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        placeholder="Mínimo 8 caracteres"
         required
         minLength={6}
+        showStrength
+        autoComplete="new-password"
       />
-      <div className="flex flex-col gap-1">
-        <label htmlFor="role" className="text-sm font-medium text-gray-700">¿Cómo quieres usar Smart?</label>
-        <select
-          id="role"
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-        >
-          <option value="tenant">Buscar propiedades (Huésped)</option>
-          <option value="host">Publicar propiedades (Anfitrión)</option>
-        </select>
-      </div>
-      <Button type="submit" loading={loading} size="lg" className="w-full">
+
+      <label className="flex cursor-pointer items-start gap-2.5">
+        <input
+          type="checkbox"
+          checked={acceptedTerms}
+          onChange={e => setAcceptedTerms(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600"
+          required
+        />
+        <span className="text-xs text-gray-500 leading-relaxed">
+          Acepto los{' '}
+          <a href="#" className="font-medium text-blue-600 hover:underline">
+            términos y condiciones
+          </a>{' '}
+          y la{' '}
+          <a href="#" className="font-medium text-blue-600 hover:underline">
+            política de privacidad
+          </a>
+          .
+        </span>
+      </label>
+
+      <Button type="submit" loading={loading} size="lg" className="w-full" disabled={!acceptedTerms}>
         Crear cuenta
       </Button>
-      <p className="text-center text-sm text-gray-500">
-        ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="font-medium text-blue-600 hover:underline">
-          Inicia sesión
-        </Link>
-      </p>
+
+      <div className="flex items-center gap-3">
+        <hr className="flex-1 border-gray-200" />
+        <span className="whitespace-nowrap text-xs text-gray-400">o continúa con</span>
+        <hr className="flex-1 border-gray-200" />
+      </div>
+
+      <GoogleButton />
     </form>
   )
 }
