@@ -80,7 +80,7 @@ export const PropertiesHomePage = () => {
                 type="number"
                 value={budget}
                 onChange={e => setBudget(e.target.value)}
-                placeholder="S/ Presupuesto máx"
+                placeholder="Presupuesto máx"
                 min={0}
                 className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none"
               />

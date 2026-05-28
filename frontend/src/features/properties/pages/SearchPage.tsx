@@ -118,13 +118,6 @@ export const SearchPage = () => {
                   {filter}
                 </button>
               ))}
-              <button
-                type="button"
-                onClick={() => setShowAdvanced(true)}
-                className="shrink-0 rounded-full border border-gray-300 px-3.5 py-1.5 text-xs font-medium text-gray-600 hover:border-blue-400"
-              >
-                Filtros ⚙️
-              </button>
             </div>
           </div>
 
@@ -155,8 +148,9 @@ export const SearchPage = () => {
         {/* ── Map panel ── */}
         <div
           className={cn(
-            'flex-1 border-l border-gray-100',
+            'isolate flex-1 border-l border-gray-100 transition-[filter] duration-200',
             showMap ? 'hidden md:block' : 'hidden',
+            showAdvanced && 'blur-sm pointer-events-none',
           )}
         >
           <PropertySearchMap properties={properties} />
