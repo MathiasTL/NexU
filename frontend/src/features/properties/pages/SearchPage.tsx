@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { SlidersHorizontal, Map, List, Search } from 'lucide-react'
+import { SlidersHorizontal, Map, List } from 'lucide-react'
+import { UniversityCombobox } from '@/shared/components/ui/UniversityCombobox'
 import { propertyService } from '../services/property.service'
 import { PropertyCard } from '../components/PropertyCard'
 import { PropertySearchMap } from '../components/PropertySearchMap'
@@ -9,7 +10,6 @@ import {
   type AdvancedFilterValues,
   DEFAULT_FILTERS,
 } from '../components/AdvancedFilters'
-import { Input } from '@/shared/components/ui/Input'
 import { LoadingSkeleton } from '@/shared/components/feedback/LoadingSkeleton'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { useDebounce } from '@/shared/hooks/useDebounce'
@@ -36,13 +36,15 @@ export const SearchPage = () => {
     propertyService
       .search({
         query: debouncedQuery || undefined,
-        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : (advancedFilters.maxPrice ?? undefined),
+        nearUniversity: advancedFilters.nearUniversity || undefined,
+        district: advancedFilters.district || undefined,
       })
       .then(data => {
         setProperties(data)
         setLoading(false)
       })
-  }, [debouncedQuery, searchParams])
+  }, [debouncedQuery, searchParams, advancedFilters])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,16 +65,13 @@ export const SearchPage = () => {
           <div className="sticky top-0 z-10 border-b border-gray-100 bg-white">
             {/* Search row */}
             <div className="flex items-center gap-2 p-4">
-              <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <Input
-                    value={query}
-                    onChange={e => setQuery(e.target.value)}
-                    placeholder="Buscar por distrito o universidad..."
-                    className="pl-9"
-                  />
-                </div>
+              <form onSubmit={handleSearch} className="flex-1">
+                <UniversityCombobox
+                  value={query}
+                  onChange={v => { setQuery(v); setSearchParams(v ? { q: v } : {}) }}
+                  placeholder="Buscar por distrito o universidad..."
+                  className="w-full"
+                />
               </form>
 
               {/* Advanced filters button */}

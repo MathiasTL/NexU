@@ -25,6 +25,7 @@ export interface Property {
   houseRules: string[]
   status: 'active' | 'inactive'
   createdAt: string
+  nearUniversity?: string
 }
 
 export interface PropertySearchFilters {
@@ -34,6 +35,7 @@ export interface PropertySearchFilters {
   capacity?: number
   amenities?: string[]
   query?: string
+  nearUniversity?: string
 }
 
 export interface BookingDraft {

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
+import { UniversityCombobox } from '@/shared/components/ui/UniversityCombobox'
 
 export interface AdvancedFilterValues {
   housingType: string
@@ -279,12 +280,10 @@ export const AdvancedFilters = ({
               <div className="grid grid-cols-1 gap-5 pb-5 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-gray-500">Universidad cercana</label>
-                  <input
-                    type="text"
+                  <UniversityCombobox
                     value={values.nearUniversity}
-                    onChange={e => set('nearUniversity', e.target.value)}
-                    placeholder="UNMSM, UNI, PUCP..."
-                    className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    onChange={v => set('nearUniversity', v)}
+                    placeholder="Todas las universidades"
                   />
                 </div>
 

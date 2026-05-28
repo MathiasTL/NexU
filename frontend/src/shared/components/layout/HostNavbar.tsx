@@ -19,10 +19,7 @@ export const HostNavbar = () => {
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link to="/host" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-            <span className="text-sm font-bold text-white">N</span>
-          </div>
-          <span className="text-lg font-bold text-gray-900">NexU</span>
+          <img src="/logo.png" alt="NexU" className="h-16 w-auto" />
           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Anfitrión</span>
         </Link>
 

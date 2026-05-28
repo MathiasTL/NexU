@@ -23,7 +23,14 @@ export const propertyService = {
     await delay()
     return PROPERTIES_MOCK.filter(p => {
       if (p.status !== 'active') return false
-      if (filters.query && !p.title.toLowerCase().includes(filters.query.toLowerCase()) && !p.district.toLowerCase().includes(filters.query.toLowerCase())) return false
+      if (filters.query) {
+        const q = filters.query.toUpperCase()
+        const matchesUniversity = p.nearUniversity?.toUpperCase() === q
+        const matchesTitle = p.title.toLowerCase().includes(filters.query.toLowerCase())
+        const matchesDistrict = p.district.toLowerCase().includes(filters.query.toLowerCase())
+        if (!matchesUniversity && !matchesTitle && !matchesDistrict) return false
+      }
+      if (filters.nearUniversity && p.nearUniversity?.toUpperCase() !== filters.nearUniversity.toUpperCase()) return false
       if (filters.district && !p.district.toLowerCase().includes(filters.district.toLowerCase())) return false
       if (filters.maxPrice && p.pricePerNight > filters.maxPrice) return false
       if (filters.minPrice && p.pricePerNight < filters.minPrice) return false
