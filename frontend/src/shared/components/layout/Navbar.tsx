@@ -19,17 +19,17 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+      <div className="mx-auto grid max-w-7xl grid-cols-3 items-center px-4 py-3">
         <Link to="/" className="flex items-center">
           <img src="/logo.png" alt="NexU" className="h-16 w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center justify-center gap-6 md:flex">
           <Link to="/" className="text-sm font-medium text-gray-600 hover:text-gray-900">Inicio</Link>
           <Link to="/search" className="text-sm font-medium text-gray-600 hover:text-gray-900">Explorar</Link>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-3">
           {isAuthenticated && user ? (
             <div className="relative">
               <button
