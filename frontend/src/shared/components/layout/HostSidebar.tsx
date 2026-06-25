@@ -4,10 +4,10 @@ import { cn } from '@/shared/utils/cn'
 
 export const HostSidebar = () => {
   const links = [
-    { to: '/host', icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: '/host/properties', icon: Building2, label: 'Propiedades' },
-    { to: '/host/reservations', icon: Calendar, label: 'Reservas' },
-    { to: '/host/reviews', icon: Star, label: 'Reseñas' },
+    { to: '/host',             icon: LayoutDashboard, label: 'Dashboard',   end: true },
+    { to: '/host/properties',  icon: Building2,       label: 'Propiedades' },
+    { to: '/host/reservations',icon: Calendar,        label: 'Reservas' },
+    { to: '/host/reviews',     icon: Star,            label: 'Reseñas' },
   ]
 
   return (
@@ -20,17 +20,19 @@ export const HostSidebar = () => {
             end={end}
             className={({ isActive }) =>
               cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-100')
+                isActive
+                  ? 'bg-primary-50 text-primary-600 dark:bg-primary/10 dark:text-primary'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800')
             }
           >
             <Icon className="h-4 w-4" />
             {label}
           </NavLink>
         ))}
-        <hr className="my-2 border-gray-100" />
+        <hr className="my-2 border-gray-100 dark:border-gray-800" />
         <NavLink
           to="/"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-gray-800"
         >
           <ArrowLeft className="h-4 w-4" />
           Ver como estudiante

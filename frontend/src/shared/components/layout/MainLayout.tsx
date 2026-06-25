@@ -3,7 +3,7 @@ import { Navbar } from './Navbar'
 import { MobileBottomNav } from './MobileBottomNav'
 
 const Footer = () => (
-  <footer className="hidden border-t border-gray-100 bg-secondary py-10 mt-12 md:block">
+  <footer className="hidden border-t border-gray-100 bg-secondary py-10 mt-12 md:block dark:border-gray-800">
     <div className="mx-auto max-w-7xl px-4">
       <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
         <div className="flex items-center">
@@ -21,7 +21,7 @@ const Footer = () => (
 )
 
 export const MainLayout = () => (
-  <div className="flex min-h-screen flex-col">
+  <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900">
     <Navbar />
     {/* pb-16 en mobile para que el contenido no quede tapado por el bottom nav */}
     <main className="flex-1 pb-16 md:pb-0">

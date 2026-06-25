@@ -17,13 +17,13 @@ export const AccountSidebar = () => {
   }, [user])
 
   const links = [
-    { to: '/account/profile', icon: User, label: 'Mi perfil' },
-    { to: '/account/personal-info', icon: Shield, label: 'Info personal' },
-    { to: '/account/bookings', icon: Calendar, label: 'Reservas' },
-    { to: '/account/favorites', icon: Heart, label: 'Favoritos' },
-    { to: '/account/notifications', icon: Bell, label: 'Notificaciones', badge: unreadCount },
-    { to: '/account/messages', icon: MessageSquare, label: 'Mensajes' },
-    { to: '/account/preferences', icon: Settings2, label: 'Preferencias' },
+    { to: '/account/profile',       icon: User,         label: 'Mi perfil' },
+    { to: '/account/personal-info',  icon: Shield,       label: 'Info personal' },
+    { to: '/account/bookings',       icon: Calendar,     label: 'Reservas' },
+    { to: '/account/favorites',      icon: Heart,        label: 'Favoritos' },
+    { to: '/account/notifications',  icon: Bell,         label: 'Notificaciones', badge: unreadCount },
+    { to: '/account/messages',       icon: MessageSquare, label: 'Mensajes' },
+    { to: '/account/preferences',    icon: Settings2,    label: 'Preferencias' },
   ]
 
   return (
@@ -36,7 +36,9 @@ export const AccountSidebar = () => {
             className={({ isActive }) =>
               cn(
                 'flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-100'
+                isActive
+                  ? 'bg-primary-50 text-primary-600 dark:bg-primary/10 dark:text-primary'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
               )
             }
           >

@@ -1,7 +1,7 @@
 import { Calendar, Users, MessageSquare } from 'lucide-react'
 import { Modal } from '@/shared/components/ui/Modal'
 import { BookingStatusBadge } from './BookingStatusBadge'
-import { formatDate, formatCurrency, formatNights } from '@/shared/utils/formatters'
+import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
 import { PROPERTIES_MOCK } from '@/mock/properties.mock'
 import type { Booking } from '../types/booking.types'
 
@@ -22,68 +22,68 @@ export const BookingDetailModal = ({ booking, open, onClose }: BookingDetailModa
           <div className="flex gap-3">
             <img src={property.images[0]} alt={property.title} className="h-16 w-20 rounded-xl object-cover" />
             <div>
-              <p className="font-semibold text-gray-900">{property.title}</p>
-              <p className="text-sm text-gray-500">{property.district}, {property.city}</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{property.title}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{property.district}, {property.city}</p>
             </div>
           </div>
         )}
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Estado:</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
           <BookingStatusBadge status={booking.status} />
         </div>
 
-        <div className="grid grid-cols-2 gap-3 rounded-xl bg-gray-50 p-3 text-sm">
+        <div className="grid grid-cols-2 gap-3 rounded-xl bg-gray-50 p-3 text-sm dark:bg-gray-700/50">
           <div>
-            <p className="text-xs text-gray-400">Check-in</p>
-            <p className="font-medium text-gray-900">{formatDate(booking.checkinDate)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400">Check-out</p>
-            <p className="font-medium text-gray-900">{formatDate(booking.checkoutDate)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400">Personas</p>
-            <p className="font-medium text-gray-900 flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" /> {booking.guestCount}
+            <p className="text-xs text-gray-400 dark:text-gray-500">Inicio</p>
+            <p className="flex items-center gap-1 font-medium text-gray-900 dark:text-white">
+              <Calendar className="h-3.5 w-3.5" /> {formatYearMonth(booking.startMonth)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Duración</p>
-            <p className="font-medium text-gray-900 flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5" /> {formatNights(booking.nightCount)}
+            <p className="text-xs text-gray-400 dark:text-gray-500">Duración</p>
+            <p className="font-medium text-gray-900 dark:text-white">{formatMonths(booking.durationMonths)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Residentes</p>
+            <p className="flex items-center gap-1 font-medium text-gray-900 dark:text-white">
+              <Users className="h-3.5 w-3.5" /> {booking.residentCount}
             </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Precio mensual</p>
+            <p className="font-medium text-gray-900 dark:text-white">{formatCurrency(booking.pricePerMonth)}/mes</p>
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5 text-sm">
-          <div className="flex justify-between text-gray-600">
-            <span>{formatCurrency(booking.pricePerNight)} × {formatNights(booking.nightCount)}</span>
-            <span>{formatCurrency(booking.pricePerNight * booking.nightCount)}</span>
+          <div className="flex justify-between text-gray-600 dark:text-gray-400">
+            <span>{formatCurrency(booking.pricePerMonth)} × {formatMonths(booking.durationMonths)}</span>
+            <span>{formatCurrency(booking.pricePerMonth * booking.durationMonths)}</span>
           </div>
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Tarifa de servicio</span>
             <span>{formatCurrency(booking.serviceFee)}</span>
           </div>
-          <div className="flex justify-between font-bold text-gray-900">
+          <div className="flex justify-between font-bold text-gray-900 dark:text-white">
             <span>Total</span>
             <span>{formatCurrency(booking.totalAmount)}</span>
           </div>
         </div>
 
         {booking.guestMessage && (
-          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
-            <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-500">
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700/50">
+            <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
               <MessageSquare className="h-3.5 w-3.5" /> Mensaje del estudiante
             </p>
-            <p className="text-sm text-gray-700">{booking.guestMessage}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{booking.guestMessage}</p>
           </div>
         )}
 
         {booking.hostNote && (
-          <div className="rounded-xl border border-primary-100 bg-primary-50 p-3">
-            <p className="mb-1 text-xs font-semibold text-primary-600">Nota del propietario</p>
-            <p className="text-sm text-secondary">{booking.hostNote}</p>
+          <div className="rounded-xl border border-primary-100 bg-primary-50 p-3 dark:border-primary/20 dark:bg-primary/10">
+            <p className="mb-1 text-xs font-semibold text-primary-600 dark:text-primary">Nota del propietario</p>
+            <p className="text-sm text-secondary dark:text-secondary-300">{booking.hostNote}</p>
           </div>
         )}
       </div>

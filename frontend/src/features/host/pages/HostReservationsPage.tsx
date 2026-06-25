@@ -54,7 +54,7 @@ export const HostReservationsPage = () => {
               className={`shrink-0 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeFilter === f.key
                   ? 'bg-primary text-white'
-                  : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  : 'border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
               }`}
             >
               {f.label}
@@ -82,7 +82,7 @@ export const HostReservationsPage = () => {
       </div>
 
       {selected && (
-        <div className="w-80 shrink-0 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="w-80 shrink-0 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <ReservationDetailPanel
             booking={selected}
             onClose={() => setSelected(null)}

@@ -4,9 +4,9 @@ import { useAuth } from '@/core/auth/useAuth'
 import { cn } from '@/shared/utils/cn'
 
 const PUBLIC_LINKS = [
-  { to: '/',               icon: Home,     label: 'Inicio' },
-  { to: '/search',         icon: Search,   label: 'Explorar' },
-  { to: '/recommendations',icon: Sparkles, label: 'Para ti' },
+  { to: '/',                icon: Home,     label: 'Inicio' },
+  { to: '/search',          icon: Search,   label: 'Explorar' },
+  { to: '/recommendations', icon: Sparkles, label: 'Para ti' },
 ]
 
 const AUTH_LINKS = [
@@ -22,8 +22,10 @@ export const MobileBottomNav = () => {
     : [...PUBLIC_LINKS, { to: '/login', icon: User, label: 'Acceder' }]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[900] border-t border-gray-100 bg-white md:hidden"
-         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-[900] border-t border-gray-100 bg-white md:hidden dark:border-gray-800 dark:bg-gray-900"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
       <div className="flex h-14 items-stretch">
         {links.map(({ to, icon: Icon, label }) => (
           <NavLink
@@ -33,7 +35,7 @@ export const MobileBottomNav = () => {
             className={({ isActive }) =>
               cn(
                 'flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors',
-                isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600',
+                isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300',
               )
             }
           >

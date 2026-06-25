@@ -87,7 +87,7 @@ export const SearchPage = () => {
       <div className="flex w-full flex-col overflow-y-auto md:w-[55%] lg:w-[50%]">
 
         {/* Search bar */}
-        <div className="sticky top-0 z-10 border-b border-gray-100 bg-white p-4">
+        <div className="sticky top-0 z-10 border-b border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               value={query}
@@ -114,15 +114,15 @@ export const SearchPage = () => {
             {ROOM_TYPES.map(rt => (
               <button key={rt.value} onClick={() => setRoomType(rt.value)}
                 className={cn(
-                  'shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors',
-                  roomType === rt.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  'shrink-0 rounded-full px-3 py-2 text-xs font-medium transition-colors',
+                  roomType === rt.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                 )}>
                 {rt.label}
               </button>
             ))}
           </div>
 
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             {loading ? 'Buscando...' : `${properties.length} ${properties.length === 1 ? 'alojamiento encontrado' : 'alojamientos encontrados'}`}
             {activeFilterCount > 0 && <span className="ml-1 text-primary">· {activeFilterCount} filtro{activeFilterCount > 1 ? 's' : ''} activo{activeFilterCount > 1 ? 's' : ''}</span>}
           </p>
@@ -143,7 +143,7 @@ export const SearchPage = () => {
       </div>
 
       {/* Map */}
-      <div className={`hidden flex-1 border-l border-gray-100 md:block ${showMap ? '' : 'hidden'}`}>
+      <div className={`hidden flex-1 border-l border-gray-100 md:block dark:border-gray-800 ${showMap ? '' : 'hidden'}`}>
         <PropertySearchMap properties={properties} />
       </div>
 

@@ -1,11 +1,11 @@
 import { cn } from '@/shared/utils/cn'
 
 export const Skeleton = ({ className }: { className?: string }) => (
-  <div className={cn('animate-pulse rounded-lg bg-gray-200', className)} />
+  <div className={cn('animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700', className)} />
 )
 
 export const PropertyCardSkeleton = () => (
-  <div className="overflow-hidden rounded-2xl border border-gray-100">
+  <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-700">
     <Skeleton className="h-48 w-full rounded-none" />
     <div className="space-y-2 p-4">
       <Skeleton className="h-4 w-3/4" />

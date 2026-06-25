@@ -3,54 +3,56 @@ import { useNavigate } from 'react-router-dom'
 import { AlertTriangle } from 'lucide-react'
 import { useAuth } from '@/core/auth/useAuth'
 import { Button } from '@/shared/components/ui/Button'
-import { formatCurrency, calcNights, formatNights } from '@/shared/utils/formatters'
-import type { Property } from '../types/property.types'
-import type { BookingDraft } from '../types/property.types'
+import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
+import type { Property, BookingDraft } from '../types/property.types'
 
 interface PropertyBookingCardProps {
   property: Property
   onBook: (draft: BookingDraft) => void
 }
 
-const today    = new Date().toISOString().split('T')[0]
-const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+const DURATION_OPTIONS = [1, 2, 3, 6, 12]
+
+const nextMonths = Array.from({ length: 6 }, (_, i) => {
+  const d = new Date()
+  d.setDate(1)
+  d.setMonth(d.getMonth() + i)
+  return d.toISOString().slice(0, 7)
+})
 
 export const PropertyBookingCard = ({ property, onBook }: PropertyBookingCardProps) => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const [checkin,  setCheckin]  = useState(today)
-  const [checkout, setCheckout] = useState(tomorrow)
-  const [persons,  setPersons]  = useState(1)
+  const [startMonth,     setStartMonth]     = useState(nextMonths[0])
+  const [durationMonths, setDurationMonths] = useState(1)
+  const [residents,      setResidents]      = useState(1)
 
-  const nights    = calcNights(checkin, checkout)
-  const subtotal  = nights * property.pricePerNight
+  const subtotal   = property.pricePerMonth * durationMonths
   const serviceFee = Math.round(subtotal * 0.14)
-  const total     = subtotal + serviceFee
+  const total      = subtotal + serviceFee
 
   const isUnavailable = property.availabilityStatus === 'unavailable'
   const isReserved    = property.availabilityStatus === 'reserved'
 
   const handleReserve = () => {
     if (!isAuthenticated) { navigate('/login'); return }
-    if (nights < 1 || isUnavailable) return
-    onBook({ checkinDate: checkin, checkoutDate: checkout, guestCount: persons })
+    if (isUnavailable) return
+    onBook({ startMonth, durationMonths, residentCount: residents })
   }
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-md">
-      {/* Monthly price (primary) */}
-      <div className="mb-1 flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-gray-900">{formatCurrency(property.pricePerMonth)}</span>
-        <span className="text-gray-500">/ mes</span>
+    <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-gray-700 dark:bg-gray-800">
+      {/* Monthly price */}
+      <div className="mb-4 flex items-baseline gap-1">
+        <span className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
+        <span className="text-gray-500 dark:text-gray-400">/ mes</span>
       </div>
-      <p className="mb-4 text-xs text-gray-400">
-        {formatCurrency(property.pricePerNight)}/noche para estadías cortas
-      </p>
 
       {/* Availability warning */}
       {(isUnavailable || isReserved) && (
         <div className={`mb-4 flex items-start gap-2 rounded-xl border p-3 text-sm ${
-          isUnavailable ? 'border-red-100 bg-red-50 text-red-700' : 'border-amber-100 bg-amber-50 text-amber-700'
+          isUnavailable ? 'border-red-100 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400'
+                       : 'border-amber-100 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-400'
         }`}>
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
@@ -61,39 +63,43 @@ export const PropertyBookingCard = ({ property, onBook }: PropertyBookingCardPro
         </div>
       )}
 
-      {/* Date + person picker */}
-      <div className="mb-3 overflow-hidden rounded-xl border border-gray-200">
+      {/* Booking form */}
+      <div className="mb-3 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-600">
         <div className="grid grid-cols-2">
-          <div className="border-r border-gray-200 p-2">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Llegada</label>
-            <input
-              type="date"
-              value={checkin}
-              min={today}
-              onChange={e => setCheckin(e.target.value)}
-              className="w-full text-sm font-medium text-gray-900 outline-none"
-            />
+          <div className="border-r border-gray-200 p-2 dark:border-gray-600">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Inicio</label>
+            <select
+              value={startMonth}
+              onChange={e => setStartMonth(e.target.value)}
+              className="w-full bg-transparent text-sm font-medium text-gray-900 outline-none dark:text-white"
+            >
+              {nextMonths.map(m => (
+                <option key={m} value={m}>{formatYearMonth(m)}</option>
+              ))}
+            </select>
           </div>
           <div className="p-2">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Salida</label>
-            <input
-              type="date"
-              value={checkout}
-              min={checkin}
-              onChange={e => setCheckout(e.target.value)}
-              className="w-full text-sm font-medium text-gray-900 outline-none"
-            />
+            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Duración</label>
+            <select
+              value={durationMonths}
+              onChange={e => setDurationMonths(Number(e.target.value))}
+              className="w-full bg-transparent text-sm font-medium text-gray-900 outline-none dark:text-white"
+            >
+              {DURATION_OPTIONS.map(n => (
+                <option key={n} value={n}>{formatMonths(n)}</option>
+              ))}
+            </select>
           </div>
         </div>
-        <div className="border-t border-gray-200 p-2">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Personas</label>
+        <div className="border-t border-gray-200 p-2 dark:border-gray-600">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Residentes</label>
           <select
-            value={persons}
-            onChange={e => setPersons(Number(e.target.value))}
-            className="w-full text-sm font-medium text-gray-900 outline-none"
+            value={residents}
+            onChange={e => setResidents(Number(e.target.value))}
+            className="w-full bg-transparent text-sm font-medium text-gray-900 outline-none dark:text-white"
           >
             {Array.from({ length: property.capacity }, (_, i) => i + 1).map(n => (
-              <option key={n} value={n}>{n} {n === 1 ? 'persona' : 'personas'}</option>
+              <option key={n} value={n}>{n} {n === 1 ? 'residente' : 'residentes'}</option>
             ))}
           </select>
         </div>
@@ -107,23 +113,21 @@ export const PropertyBookingCard = ({ property, onBook }: PropertyBookingCardPro
             : 'Iniciar sesión para reservar'}
       </Button>
 
-      {nights > 0 && !isUnavailable && (
-        <div className="mt-4 flex flex-col gap-2 text-sm">
-          <div className="flex justify-between text-gray-600">
-            <span>{formatCurrency(property.pricePerNight)} × {formatNights(nights)}</span>
-            <span>{formatCurrency(subtotal)}</span>
-          </div>
-          <div className="flex justify-between text-gray-600">
-            <span>Tarifa de servicio</span>
-            <span>{formatCurrency(serviceFee)}</span>
-          </div>
-          <hr className="border-gray-100" />
-          <div className="flex justify-between font-semibold text-gray-900">
-            <span>Total</span>
-            <span>{formatCurrency(total)}</span>
-          </div>
+      <div className="mt-4 flex flex-col gap-2 text-sm">
+        <div className="flex justify-between text-gray-600 dark:text-gray-400">
+          <span>{formatCurrency(property.pricePerMonth)} × {formatMonths(durationMonths)}</span>
+          <span>{formatCurrency(subtotal)}</span>
         </div>
-      )}
+        <div className="flex justify-between text-gray-600 dark:text-gray-400">
+          <span>Tarifa de servicio</span>
+          <span>{formatCurrency(serviceFee)}</span>
+        </div>
+        <hr className="border-gray-100 dark:border-gray-700" />
+        <div className="flex justify-between font-semibold text-gray-900 dark:text-white">
+          <span>Total estimado</span>
+          <span>{formatCurrency(total)}</span>
+        </div>
+      </div>
     </div>
   )
 }
