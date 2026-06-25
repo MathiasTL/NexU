@@ -298,7 +298,8 @@ frontend/src/
     │   │   ├── GoogleButton.tsx        ← placeholder "Próximamente disponible"
     │   │   └── UniversityCombobox.tsx  ← portal dropdown, 14 universidades Lima
     │   ├── feedback/ EmptyState, ErrorMessage, LoadingSkeleton
-    │   └── layout/ MainLayout, Navbar, AccountLayout, AccountSidebar,
+    │   └── layout/ MainLayout, Navbar, MobileBottomNav,
+    │               AccountLayout, AccountSidebar,
     │               HostLayout, HostSidebar, HostNavbar
     ├── constants/
     │   └── universities.ts             ← LIMA_UNIVERSITIES (14 universidades)
@@ -807,6 +808,59 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 
 ---
 
+### ✅ Completado — UX y responsive (ya implementado)
+
+> Cambios implementados el 2026-06-25 adicionales a los de alta prioridad.
+
+3. ~~**Navbar responsive: separar desktop y mobile**~~ — **HECHO.**
+   - Desktop: navbar superior con 3 columnas centradas (Logo | Links | Cuenta). Sin hamburger.
+   - Mobile: navbar superior simplificada (solo Logo + botón Acceder si no autenticado,
+     o avatar si autenticado). El menú hamburger fue eliminado.
+   - **Nuevo `MobileBottomNav.tsx`** (`src/shared/components/layout/MobileBottomNav.tsx`):
+     bottom bar fijo en mobile con 5 tabs (Inicio, Explorar, Para ti, Guardados, Cuenta).
+     Usa `NavLink` con indicador activo en color coral. Respeta `safe-area-inset-bottom`
+     para notch de iPhone.
+   - `MainLayout.tsx` actualizado: incluye `<MobileBottomNav />`, `pb-16 md:pb-0` en `<main>`,
+     footer oculto en mobile (`hidden md:block`).
+
+4. ~~**Mapa: tile revertido + tipografía mejorada + bordes de campus**~~ — **HECHO (tile) / ⚠️ PARCIAL (campus).**
+
+   **Tile layer:** revertido a **OpenStreetMap estándar** (se descartó CartoDB Positron).
+
+   **Tipografía de divIcons mejorada:**
+   - Labels universitarios: `font-family: Inter/system`, `font-size: 10px`, `font-weight: 600`,
+     `letter-spacing: .4px`. Antes: 9px sin font-family explícito.
+   - Popups: `font-family` inline en el contenedor del popup.
+
+   **Bordes de campus universitario — ⚠️ PARCIAL (polígonos aproximados, arquitectura lista):**
+
+   **Arquitectura implementada:**
+   - Datos centralizados en `src/shared/data/universityCampuses.ts` como GeoJSON
+     `FeatureCollection` con interfaz `CampusFeature` tipada.
+   - Componente usa `<GeoJSON>` de `react-leaflet`, que renderiza todos los polígonos
+     en un único pase genérico; la lógica no conoce nombres de universidades.
+   - Para agregar una universidad nueva: solo agregar una entrada al array `features`.
+     No se modifica ningún otro archivo.
+   - Para reemplazar un polígono aproximado por uno oficial: solo cambiar `geometry.coordinates`
+     y `status: 'official'` en la entrada correspondiente.
+   - Los polígonos `official` se muestran con borde sólido; los `approximate` con borde punteado
+     (`dashArray: '6 4'`) — distinción visual automática.
+
+   **Universidades cubiertas (10):** PUCP, UNMSM, UNI, UPC, ULIMA, UP, USIL, UNFV, UNAC, UPCH.
+
+   **Corrección del ícono de label:**
+   - Problema anterior: `iconAnchor: [20, 10]` era fijo e incorrecto para textos de distinta longitud.
+   - Solución: `iconSize: [0, 0]` + `iconAnchor: [0, 0]` coloca el punto de anclaje en la coordenada;
+     el div interior usa `position:absolute; transform:translate(-50%,-50%)` para autocentrarse
+     sin depender del ancho del texto. Funciona para "UP" y "UNMSM" sin ajuste manual.
+
+   **Por qué sigue siendo PARCIAL:**
+   - Los polígonos son aproximaciones manuales basadas en coordenadas conocidas de cada campus.
+     No reflejan el contorno exacto del terreno oficial.
+   - Para precisión real se necesita GeoJSON oficial (ver ítem B4 en prioridad baja, actualizado).
+
+---
+
 ### ✅ Completado — prioridad alta (ya implementado)
 
 > Estos ítems estaban pendientes en la auditoría y fueron resueltos el 2026-06-25.
@@ -919,6 +973,59 @@ Estos ítems son mejoras de producto, no bloquean ni el backend ni la demo funci
   el badge de compatibilidad está visible.
 - Ejemplo: `"✅ Cerca de PUCP · ✅ Dentro de tu presupuesto · ✅ Espacio sin humo"`.
 
+#### B4 — Actualizar polígonos de campus a límites oficiales
+
+**Estado de la arquitectura:** YA IMPLEMENTADA. El componente ya usa `<GeoJSON>` y la
+estructura de datos está lista. Solo falta reemplazar las coordenadas aproximadas.
+
+**Archivo a editar:** `src/shared/data/universityCampuses.ts`
+
+**Qué hacer para cada universidad:**
+1. Obtener datos GeoJSON de los límites reales. Fuentes recomendadas:
+   - **Overpass API (OSM):**
+     ```
+     [out:json];
+     (
+       relation["amenity"="university"]["name"~"Universidad"]["addr:country"="PE"];
+       way["amenity"="university"]["name"~"Universidad"]["addr:country"="PE"];
+     );
+     out geom;
+     ```
+     O buscar la universidad en https://www.openstreetmap.org y exportar el JSON de la relación.
+   - **GeoJSON.io:** dibujar manualmente sobre satélite y exportar GeoJSON.
+   - **Datos MINEDU / IDEP:** plataformas de datos abiertos del gobierno peruano.
+
+2. En `universityCampuses.ts`, localizar la entrada correspondiente y:
+   - Reemplazar `geometry.coordinates` con el anillo exterior del polígono oficial.
+   - Cambiar `status: 'approximate'` → `status: 'official'`.
+   - Actualizar `source` con la URL o referencia del dato.
+   - Si el campus tiene múltiples áreas desconectadas, cambiar el tipo a
+     `MultiPolygon` con `coordinates: [ring1, ring2, ...]` — el componente ya maneja
+     ambos tipos porque `<GeoJSON>` de react-leaflet los soporta nativamente.
+
+3. No se requiere ningún cambio en `PropertySearchMap.tsx`.
+
+**Ejemplo de entrada actualizada:**
+```ts
+{
+  type: 'Feature',
+  properties: {
+    id: 'pucp',
+    abbr: 'PUCP',
+    fullName: 'Pontificia Universidad Católica del Perú',
+    status: 'official',                           // ← cambiar
+    center: [-12.0702, -77.0803],
+    source: 'OSM relation 1234567 — extraído 2026-07',  // ← actualizar
+  },
+  geometry: {
+    type: 'Polygon',
+    coordinates: [[ /* coordenadas oficiales */ ]],  // ← reemplazar
+  },
+},
+```
+
+---
+
 #### B3 — Migrar `pricePerNight` del flujo de booking
 
 - El flujo de reserva (`CheckoutModal`, `BookingDetailModal`, `booking.service`) aún calcula
@@ -959,3 +1066,6 @@ Marcar como ✅ cuando esté implementado y verificado con `npx tsc --noEmit`:
 | 2.0 | 2026-06-25 | Primera auditoría completa (v1). Pasos 1–3 verificados. 16 interfaces documentadas. Veredicto "Viable parcialmente". Storage key corregida. |
 | 3.0 | 2026-06-25 | v2 inicial. Fases UX 1–6 documentadas. Nuevas entidades, rutas, endpoints propuestos. Alta prioridad identificada. |
 | 4.0 | 2026-06-25 | Alta prioridad resuelta: wizard extendido (roomType, pricePerMonth, nearestUniversity, availabilityStatus, distancia), filtros convivencia conectados al service (petsAllowed/quietHours/hasWorkspace). Sección 7 reescrita con instrucciones para IA futura. Checklist de cierre agregado. |
+| 5.0 | 2026-06-25 | Navbar responsive: desktop 3 columnas centradas, mobile con MobileBottomNav (5 tabs, bottom bar fijo). Hamburger eliminado. Mapa: tile CartoDB Positron (minimalista), tipografía Inter en divIcons y popups, zoomControl desactivado. |
+| 6.0 | 2026-06-25 | Título de página corregido de "Smart" a "NexU" (index.html). Mapa revertido a OSM estándar. Tipografía mapa mejorada (Inter, 10px, 600). Bordes de campus universitario con Circle (aproximación circular, ⚠️ parcial — pendiente GeoJSON real en B4). |
+| 7.0 | 2026-06-25 | Refactor completo de campus universitarios en mapa. Nuevo `src/shared/data/universityCampuses.ts` con GeoJSON FeatureCollection tipada para 10 universidades (PUCP, UNMSM, UNI, UPC, ULIMA, UP, USIL, UNFV, UNAC, UPCH). Arquitectura escalable: agregar universidad = 1 entrada en el array, sin tocar lógica. Polígonos distinguen 'official'/'approximate' visualmente. Ícono de label corregido con iconSize:[0,0]+CSS transform para autocentrado independiente del largo del texto. Sigue ⚠️ Parcial por coordenadas aproximadas. |
