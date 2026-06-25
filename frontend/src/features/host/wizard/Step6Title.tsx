@@ -18,7 +18,7 @@ export const Step6Title = ({ draft, update, onNext, onPrev }: StepProps) => (
       <textarea
         value={draft.title}
         onChange={e => update({ title: e.target.value.slice(0, MAX) })}
-        className="h-24 w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-lg font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="h-24 w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-lg font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
         placeholder="Ej: Penthouse con vista al mar en Miraflores"
       />
       <p className="text-right text-xs text-gray-400">{draft.title.length}/{MAX}</p>

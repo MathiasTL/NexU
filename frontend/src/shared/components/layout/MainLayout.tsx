@@ -2,20 +2,20 @@ import { Outlet } from 'react-router-dom'
 import { Navbar } from './Navbar'
 
 const Footer = () => (
-  <footer className="border-t border-gray-100 bg-gray-50 py-8 mt-12">
+  <footer className="border-t border-gray-100 bg-secondary py-10 mt-12">
     <div className="mx-auto max-w-7xl px-4">
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
-            <span className="text-xs font-bold text-white">S</span>
+      <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+            <span className="text-xs font-bold text-white">N</span>
           </div>
-          <span className="text-sm font-semibold text-gray-700">Smart</span>
+          <span className="text-sm font-semibold text-white">NexU</span>
         </div>
-        <p className="text-sm text-gray-500">© 2026 Smart. Plataforma de alquiler en Perú.</p>
-        <div className="flex gap-4 text-sm text-gray-500">
-          <a href="#" className="hover:text-gray-700">Privacidad</a>
-          <a href="#" className="hover:text-gray-700">Términos</a>
-          <a href="#" className="hover:text-gray-700">Soporte</a>
+        <p className="text-sm text-secondary-200">© 2026 NexU. Plataforma de alojamiento universitario en Perú.</p>
+        <div className="flex gap-5 text-sm text-secondary-300">
+          <a href="#" className="transition-colors hover:text-primary">Privacidad</a>
+          <a href="#" className="transition-colors hover:text-primary">Términos</a>
+          <a href="#" className="transition-colors hover:text-primary">Soporte</a>
         </div>
       </div>
     </div>

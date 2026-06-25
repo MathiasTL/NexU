@@ -18,6 +18,12 @@ export interface CreatePropertyDraft {
   title: string
   description: string
   pricePerNight: number
+  // campos universitarios (alta prioridad)
+  roomType: 'room' | 'apartment' | 'shared' | 'studio'
+  pricePerMonth: number
+  nearestUniversity: string
+  distanceToUniversityMinutes: number
+  availabilityStatus: 'available' | 'reserved' | 'unavailable'
 }
 
 export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9

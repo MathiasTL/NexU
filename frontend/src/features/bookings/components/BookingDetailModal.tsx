@@ -43,7 +43,7 @@ export const BookingDetailModal = ({ booking, open, onClose }: BookingDetailModa
             <p className="font-medium text-gray-900">{formatDate(booking.checkoutDate)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Huéspedes</p>
+            <p className="text-xs text-gray-400">Personas</p>
             <p className="font-medium text-gray-900 flex items-center gap-1">
               <Users className="h-3.5 w-3.5" /> {booking.guestCount}
             </p>
@@ -74,16 +74,16 @@ export const BookingDetailModal = ({ booking, open, onClose }: BookingDetailModa
         {booking.guestMessage && (
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
             <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-500">
-              <MessageSquare className="h-3.5 w-3.5" /> Mensaje del huésped
+              <MessageSquare className="h-3.5 w-3.5" /> Mensaje del estudiante
             </p>
             <p className="text-sm text-gray-700">{booking.guestMessage}</p>
           </div>
         )}
 
         {booking.hostNote && (
-          <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-            <p className="mb-1 text-xs font-semibold text-blue-700">Nota del anfitrión</p>
-            <p className="text-sm text-blue-900">{booking.hostNote}</p>
+          <div className="rounded-xl border border-primary-100 bg-primary-50 p-3">
+            <p className="mb-1 text-xs font-semibold text-primary-600">Nota del propietario</p>
+            <p className="text-sm text-secondary">{booking.hostNote}</p>
           </div>
         )}
       </div>

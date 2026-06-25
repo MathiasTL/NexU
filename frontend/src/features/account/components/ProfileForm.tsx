@@ -7,7 +7,7 @@ import { Avatar } from '@/shared/components/ui/Avatar'
 import { ErrorMessage } from '@/shared/components/feedback/ErrorMessage'
 
 export const ProfileForm = () => {
-  const { user, login } = useAuth()
+  const { user, setAuthUser } = useAuth()
   const [form, setForm] = useState({
     firstName: user?.firstName ?? '',
     lastName: user?.lastName ?? '',
@@ -30,7 +30,7 @@ export const ProfileForm = () => {
     setSuccess(false)
     try {
       await accountService.updateProfile(user.id, form)
-      await login(user.email, '')
+      setAuthUser({ ...user, ...form })
       setSuccess(true)
     } catch {
       setError('No se pudo guardar el perfil')
@@ -69,7 +69,7 @@ export const ProfileForm = () => {
           value={form.bio}
           onChange={handleChange}
           rows={3}
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           placeholder="Cuéntales algo sobre ti a los anfitriones..."
         />
       </div>

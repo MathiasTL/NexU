@@ -20,7 +20,7 @@ export const HostSidebar = () => {
             end={end}
             className={({ isActive }) =>
               cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100')
+                isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-100')
             }
           >
             <Icon className="h-4 w-4" />
@@ -33,7 +33,7 @@ export const HostSidebar = () => {
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100"
         >
           <ArrowLeft className="h-4 w-4" />
-          Ver como huésped
+          Ver como estudiante
         </NavLink>
       </nav>
     </aside>

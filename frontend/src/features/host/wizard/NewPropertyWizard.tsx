@@ -15,6 +15,7 @@ import type { CreatePropertyDraft, WizardStep } from '../types/host.types'
 
 const INITIAL_DRAFT: CreatePropertyDraft = {
   type: '',
+  roomType: 'room',
   location: '',
   district: '',
   address: '',
@@ -25,7 +26,11 @@ const INITIAL_DRAFT: CreatePropertyDraft = {
   amenities: [],
   title: '',
   description: '',
-  pricePerNight: 100,
+  pricePerNight: 50,
+  pricePerMonth: 500,
+  nearestUniversity: '',
+  distanceToUniversityMinutes: 15,
+  availabilityStatus: 'available',
 }
 
 export const NewPropertyWizard = () => {
@@ -47,7 +52,7 @@ export const NewPropertyWizard = () => {
     await propertyService.create({
       ...draft,
       hostId: user.id,
-      shortDescription: draft.description.slice(0, 100),
+      shortDescription: draft.description.slice(0, 120),
       images: [
         'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format',
       ],
