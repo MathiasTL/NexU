@@ -350,12 +350,12 @@ de accesibilidad para verificar que los targets son >= 40px.
 
 Marcar como ✅ cuando esté implementado y verificado visualmente:
 
-- [ ] S1-A — Razones de compatibilidad visibles en `PropertyCard` (tooltip + texto)
-- [ ] S1-B — Razones de compatibilidad en `RecommendationsPage`
-- [ ] S2 — Flujo de booking migrado a `startMonth + durationMonths` (coordinar con backend)
-- [ ] S3-A — Datos mock de transporte en `limaTransport.ts`
-- [ ] S3-B — Capa de transporte toggle en `PropertySearchMap`
-- [ ] S4 — Tamaños de `Button` y chips ajustados para touch targets
+- [x] S1-A — Razones de compatibilidad visibles en `PropertyCard` (tooltip + texto)
+- [x] S1-B — Razones de compatibilidad en `RecommendationsPage`
+- [x] S2 — Flujo de booking migrado a `startMonth + durationMonths`
+- [x] S3-A — Datos mock de transporte en `limaTransport.ts`
+- [x] S3-B — Capa de transporte toggle en `PropertySearchMap`
+- [x] S4 — Tamaños de `Button` y chips ajustados para touch targets
 
 ---
 

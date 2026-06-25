@@ -170,7 +170,7 @@ Servicios existentes: `auth.service`, `property.service`, `booking.service`, `ac
 | Account — perfil y datos personales editables | ✅ Completo |
 | Account — notificaciones con marcar como leída | ✅ Completo |
 | Account — mensajería (lista + envío) | ✅ Completo |
-| Modo oscuro | ❌ No implementado |
+| Modo oscuro | ✅ Implementado — toggle Sol/Luna en navbar; preferencia persistida en `nextu_ui_v1` |
 | Persistencia de filtros de búsqueda entre sesiones | ❌ No implementado |
 | Push notifications | ❌ No implementado (ni planeado para frontend) |
 
@@ -476,12 +476,11 @@ interface Booking {
   propertyId: number                         // → Property.id
   tenantId: number                           // → User.id
   hostId: number                             // → User.id
-  checkinDate: string                        // 'YYYY-MM-DD'
-  checkoutDate: string
-  guestCount: number
-  nightCount: number
-  pricePerNight: number
-  serviceFee: number                         // 14% de (pricePerNight × nightCount)
+  startMonth: string                         // 'YYYY-MM' — mes de inicio del alquiler
+  durationMonths: number                     // duración en meses (1, 2, 3, 6, 12)
+  residentCount: number                      // número de residentes
+  pricePerMonth: number                      // precio mensual en PEN
+  serviceFee: number                         // 14% de (pricePerMonth × durationMonths)
   totalAmount: number
   currency: 'PEN'
   status: BookingStatus
@@ -491,20 +490,19 @@ interface Booking {
 }
 
 interface BookingDraft {                     // estado transitorio durante checkout en UI
-  checkinDate: string
-  checkoutDate: string
-  guestCount: number
+  startMonth: string                         // 'YYYY-MM'
+  durationMonths: number
+  residentCount: number
 }
 
 interface CreateBookingPayload {
   propertyId: number
   tenantId: number
   hostId: number
-  checkinDate: string
-  checkoutDate: string
-  guestCount: number
-  nightCount: number
-  pricePerNight: number
+  startMonth: string
+  durationMonths: number
+  residentCount: number
+  pricePerMonth: number
   serviceFee: number
   totalAmount: number
   currency: 'PEN'
@@ -711,7 +709,7 @@ GET    /bookings?hostId=:id
   Response: Booking[]
 
 POST   /bookings
-  Request:  CreateBookingPayload
+  Request:  CreateBookingPayload   // startMonth, durationMonths, residentCount, pricePerMonth
   Response: Booking
 
 PATCH  /bookings/:id/status
@@ -774,7 +772,7 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 | 4 | Favoritos y persistencia | ✅ Completa | Favoritos: ✅ (Zustand + localStorage). Filtros de búsqueda persistentes: ✅ (key `nextu_search_filters_v1`) |
 | 5 | Compatibilidad de roommates | ✅ Completa | LifestylePreferences, algoritmo 100 pts, badge en PropertyCard, PreferencesPage |
 | 6 | Recomendación guiada tipo IA | ✅ Completa | Wizard 4 pasos en /recommendations, resultados ordenados por score de compatibilidad |
-| 7 | Mejoras avanzadas | ❌ Pendiente | Modo oscuro, push notifications |
+| 7 | Mejoras avanzadas | ⚠️ Parcial | Modo oscuro ✅; push notifications ❌ |
 
 ### Detalle por subsección del plan (6.1–6.14)
 
@@ -786,13 +784,13 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 | 6.4 Búsqueda y filtros | Filtros universitarios, panel avanzado colapsable; convivencia (petsAllowed, quietHours, hasWorkspace) conectados al service | ✅ Completa |
 | 6.5 Tarjeta de propiedad | Precio mensual, badge disponibilidad, badge verificado, distancia, compatibilidad | ✅ Completa |
 | 6.6 Favoritos | localStorage, FavoritesPage, persistencia | ✅ Completa |
-| 6.7 Mapa interactivo semiótico | Pins por disponibilidad, capa universidades, leyenda, popups | ✅ Completa |
+| 6.7 Mapa interactivo semiótico | Pins por disponibilidad, capa universidades, capa de transporte (Metropolitano/Tren/Corredor) toggle, leyenda dinámica | ✅ Completa |
 | 6.8 Detalle de propiedad | Campos universitarios, badge disponibilidad, copy "propietario/personas" | ✅ Completa |
 | 6.9 Publicación de propiedad | Step1 tipos estudiantiles (4 cards), Step2 con UniversityCombobox + slider distancia, Step8 con pricePerMonth + availabilityStatus, Step9 con resumen completo | ✅ Completa |
-| 6.10 Perfil estudiantil y roommates | LifestylePreferences, algoritmo, PreferencesPage, score en cards | ✅ Completa |
+| 6.10 Perfil estudiantil y roommates | LifestylePreferences, algoritmo, PreferencesPage, score en cards con tooltip de razones y texto visible | ✅ Completa |
 | 6.11 Chat y notificaciones | Copy "propietarios/estudiantes" actualizado. Mocks de mensajes y notificaciones reescritos en contexto universitario (ciclos académicos, convivencia, alquiler mensual) | ✅ Completa |
 | 6.12 Recomendación guiada | RecommendationsPage wizard 4 pasos, explicación de razones | ✅ Completa |
-| 6.13 Modo oscuro | No implementado | ❌ Pendiente |
+| 6.13 Modo oscuro | Toggle Sol/Luna en Navbar y HostNavbar; `dark:` en layouts, sidebars, cards, inputs, modales, páginas | ✅ Completa |
 | 6.14 Offline parcial y rendimiento | Favoritos en localStorage ✅; filtros de búsqueda persistentes ✅ (key `nextu_search_filters_v1`); lazy loading imágenes ✅ | ✅ Completa |
 
 ---
@@ -934,22 +932,27 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 Estos ítems son mejoras de producto, no bloquean ni el backend ni la demo funcional.
 **Implementar después del Paso 3 o cuando el producto lo requiera.**
 
-#### B1 — Modo oscuro
+#### ~~B1 — Modo oscuro~~ — **HECHO (2026-06-25)**
 
-- Habilitar `darkMode: 'class'` en `tailwind.config.ts`.
-- Agregar `darkMode: boolean` al store `src/core/store/ui.store.ts` (Zustand + persist).
-- Agregar toggle en Navbar (ícono sol/luna).
-- Aplicar variantes `dark:` gradualmente: layout, cards, inputs, modales.
-- **Riesgo:** requiere revisar contraste en textos secundarios y fondos claros.
-- No mezclar con otros cambios grandes.
+Implementación completa. Componentes cubiertos:
 
-#### B2 — Explicación de razones de compatibilidad en resultados de búsqueda
+| Área | Archivos |
+|---|---|
+| Config | `tailwind.config.ts` (`darkMode: 'class'`) |
+| Store | `ui.store.ts` — `darkMode: boolean` + `toggleDarkMode()` con Zustand `persist` (key `nextu_ui_v1`); aplica/quita clase `dark` en `document.documentElement` en la acción y al rehidratar |
+| Navbars | `Navbar.tsx`, `HostNavbar.tsx` — toggle Sol/Luna; dark styles en header, links, dropdown |
+| Layouts | `MainLayout.tsx`, `HostLayout.tsx` — `dark:bg-gray-900`; `AccountLayout.tsx` — título dark |
+| Sidebars | `AccountSidebar.tsx`, `HostSidebar.tsx` — items activos e inactivos con dark; `MobileBottomNav.tsx` |
+| UI compartida | `Button.tsx` (secondary/outline/ghost), `Input.tsx`, `Modal.tsx`, `LoadingSkeleton.tsx` |
+| Propiedades | `PropertyCard.tsx`, `PropertyBookingCard.tsx`, `CheckoutModal.tsx`, `SuccessModal.tsx` |
+| Reservas | `BookingCard.tsx`, `BookingDetailModal.tsx`, `ReservationDetailPanel.tsx` |
+| Páginas | `SearchPage.tsx` (barra, chips, borde mapa), `HostReservationsPage.tsx` (panel, filtros) |
 
-- `calcCompatibility()` ya retorna `{ score, reasons[] }`. Las `reasons` no se muestran en
-  ningún lugar actualmente.
-- Agregar un tooltip o panel expandible en `PropertyCard` que muestre las razones cuando
-  el badge de compatibilidad está visible.
-- Ejemplo: `"✅ Cerca de PUCP · ✅ Dentro de tu presupuesto · ✅ Espacio sin humo"`.
+#### ~~B2 — Explicación de razones de compatibilidad en resultados de búsqueda~~ — **HECHO (2026-06-25)**
+
+- Badge de compatibilidad en `PropertyCard` ahora incluye `title` tooltip nativo (desktop) con las razones unidas por `·`.
+- Línea de razones visible debajo del badge en mobile (`line-clamp-1`, `text-xs text-gray-500`).
+- `RecommendationsPage`: estado ahora incluye `reasons: string[]`; se extraen de `calcCompatibility()` y se muestran debajo del badge de cada resultado.
 
 #### B4 — Actualizar polígonos de campus a límites oficiales
 
@@ -1004,14 +1007,26 @@ estructura de datos está lista. Solo falta reemplazar las coordenadas aproximad
 
 ---
 
-#### B3 — Migrar `pricePerNight` del flujo de booking
+#### ~~B3 — Migrar `pricePerNight` del flujo de booking~~ — **HECHO (2026-06-25)**
 
-- El flujo de reserva (`CheckoutModal`, `BookingDetailModal`, `booking.service`) aún calcula
-  por noches. El modelo de alquiler universitario es mensual.
-- Para migrar: cambiar `BookingDraft.checkinDate/checkoutDate` por `startDate` + `durationMonths`.
-- Recalcular `totalAmount = pricePerMonth × durationMonths + serviceFee`.
-- **Este es el cambio más invasivo de la lista** — afecta tipos, service, checkout y el panel
-  de host. Hacerlo en coordinación con el diseño del endpoint `POST /bookings` del backend.
+Flujo de booking completamente migrado a modelo mensual. Archivos actualizados:
+
+| Archivo | Cambio |
+|---|---|
+| `property.types.ts` | `BookingDraft`: `startMonth + durationMonths + residentCount` |
+| `booking.types.ts` | `Booking` y `CreateBookingPayload`: campos mensuales, eliminados `checkinDate/checkoutDate/nightCount/pricePerNight/guestCount` |
+| `mock/bookings.mock.ts` | 6 reservas migradas a `startMonth/durationMonths/residentCount/pricePerMonth`; importa tipos desde `booking.types.ts` |
+| `PropertyBookingCard.tsx` | Selectores de mes de inicio, duración (1/2/3/6/12 meses) y residentes; cálculo `pricePerMonth × durationMonths + 14%` |
+| `CheckoutModal.tsx` | Muestra `Inicio: Agosto 2026 · 3 meses · 1 residente`; cálculo mensual |
+| `SuccessModal.tsx` | Props: `startMonth + durationMonths` (reemplaza `checkinDate/checkoutDate`) |
+| `PropertyDetailPage.tsx` | `handleConfirm` usa cálculo mensual; eliminado `calcNights` |
+| `BookingCard.tsx` | Muestra `formatYearMonth(startMonth) · formatMonths(durationMonths)` |
+| `BookingDetailModal.tsx` | Grid: Inicio, Duración, Residentes, Precio mensual; cálculo mensual |
+| `ReservationDetailPanel.tsx` | Mismo que `BookingDetailModal` + "Estudiante" en lugar de "Huésped" |
+| `ActivityFeed.tsx` | Muestra `startMonth + durationMonths` |
+| `formatters.ts` | Agrega `formatMonths(n)` y `formatYearMonth('YYYY-MM')` |
+
+El contrato `POST /bookings` del backend debe usar `startMonth`, `durationMonths`, `residentCount`, `pricePerMonth`.
 
 ---
 
@@ -1048,3 +1063,5 @@ Marcar como ✅ cuando esté implementado y verificado con `npx tsc --noEmit`:
 | 6.0 | 2026-06-25 | Título de página corregido de "Smart" a "NexU" (index.html). Mapa revertido a OSM estándar. Tipografía mapa mejorada (Inter, 10px, 600). Bordes de campus universitario con Circle (aproximación circular, ⚠️ parcial — pendiente GeoJSON real en B4). |
 | 7.0 | 2026-06-25 | Refactor completo de campus universitarios en mapa. Nuevo `src/shared/data/universityCampuses.ts` con GeoJSON FeatureCollection tipada para 10 universidades (PUCP, UNMSM, UNI, UPC, ULIMA, UP, USIL, UNFV, UNAC, UPCH). Arquitectura escalable: agregar universidad = 1 entrada en el array, sin tocar lógica. Polígonos distinguen 'official'/'approximate' visualmente. Ícono de label corregido con iconSize:[0,0]+CSS transform para autocentrado independiente del largo del texto. Sigue ⚠️ Parcial por coordenadas aproximadas. |
 | 8.0 | 2026-06-25 | Prioridad media completada. M1: persistencia de filtros de búsqueda en localStorage (key `nextu_search_filters_v1`) en `SearchPage.tsx`. M2: mocks de mensajes y notificaciones reescritos en contexto universitario (ciclos académicos, convivencia, alquiler mensual). M3: `Step5Photos.tsx` reescrito con `<input type="file">`, drag & drop, previsualización local con `URL.createObjectURL` y grilla de miniaturas con botón de eliminación; `CreatePropertyDraft` extendido con `images?`. Paso 2 del frontend **completo**. |
+| 10.0 | 2026-06-25 | B1 — Modo oscuro implementado. `tailwind.config.ts`: `darkMode: 'class'`. `ui.store.ts`: `darkMode` + `toggleDarkMode` con Zustand persist (key `nextu_ui_v1`); sincroniza clase `dark` en `document.documentElement` al toggle y al rehidratar. Toggle Sol/Luna en `Navbar` y `HostNavbar`. Variantes `dark:` aplicadas a: todos los layouts (Main/Host/Account), sidebars, `MobileBottomNav`, `Button`, `Input`, `Modal`, `LoadingSkeleton`, `PropertyCard`, `PropertyBookingCard`, `BookingCard`, `BookingDetailModal`, `CheckoutModal`, `SuccessModal`, `ReservationDetailPanel`, `SearchPage`, `HostReservationsPage`. `npx tsc --noEmit` sin errores. |
+| 9.0 | 2026-06-25 | Semiótica completada (S1–S4). S1: razones de compatibilidad visibles — tooltip nativo en badge de `PropertyCard` + texto debajo; `RecommendationsPage` extrae y muestra `reasons[]`. S2: flujo de booking migrado a mensual — `BookingDraft/Booking/CreateBookingPayload` con `startMonth/durationMonths/residentCount/pricePerMonth`; `PropertyBookingCard`, `CheckoutModal`, `SuccessModal`, `PropertyDetailPage`, `BookingCard`, `BookingDetailModal`, `ReservationDetailPanel`, `ActivityFeed` actualizados; `formatters.ts` con `formatMonths` y `formatYearMonth`; mock de bookings migrado. S3: capa de transporte en mapa — `limaTransport.ts` con 10 paradas (Metropolitano/Tren/Corredor); toggle en `PropertySearchMap` con marcadores diferenciados y leyenda dinámica. S4: touch targets — `Button` `md` a `py-2.5`; chips de `SearchPage` a `py-2`. `npx tsc --noEmit` sin errores. |
