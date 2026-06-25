@@ -1,4 +1,4 @@
-# Smart — Plataforma de reservas de recintos
+# NexU — Plataforma de reservas de recintos
 
 Repositorio en proceso de migración hacia arquitectura desacoplada.
 
