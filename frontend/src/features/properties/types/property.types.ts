@@ -54,7 +54,7 @@ export interface PropertySearchFilters {
 }
 
 export interface BookingDraft {
-  checkinDate: string
-  checkoutDate: string
-  guestCount: number
+  startMonth: string      // 'YYYY-MM'
+  durationMonths: number
+  residentCount: number
 }

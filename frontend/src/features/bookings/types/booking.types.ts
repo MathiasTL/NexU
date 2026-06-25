@@ -5,12 +5,11 @@ export interface Booking {
   propertyId: number
   tenantId: number
   hostId: number
-  checkinDate: string
-  checkoutDate: string
-  guestCount: number
-  nightCount: number
-  pricePerNight: number
-  serviceFee: number
+  startMonth: string         // 'YYYY-MM'
+  durationMonths: number
+  residentCount: number
+  pricePerMonth: number
+  serviceFee: number         // 14% de (pricePerMonth × durationMonths)
   totalAmount: number
   currency: 'PEN'
   status: BookingStatus
@@ -23,11 +22,10 @@ export interface CreateBookingPayload {
   propertyId: number
   tenantId: number
   hostId: number
-  checkinDate: string
-  checkoutDate: string
-  guestCount: number
-  nightCount: number
-  pricePerNight: number
+  startMonth: string
+  durationMonths: number
+  residentCount: number
+  pricePerMonth: number
   serviceFee: number
   totalAmount: number
   currency: 'PEN'

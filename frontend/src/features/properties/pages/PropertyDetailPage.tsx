@@ -13,19 +13,17 @@ import { PropertyHostInfo } from '../components/PropertyHostInfo'
 import { CheckoutModal } from '../components/CheckoutModal'
 import { SuccessModal } from '../components/SuccessModal'
 import { Spinner } from '@/shared/components/ui/Spinner'
-import { calcNights } from '@/shared/utils/formatters'
-import type { Property } from '../types/property.types'
-import type { BookingDraft } from '../types/property.types'
+import type { Property, BookingDraft } from '../types/property.types'
 
 export const PropertyDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [property, setProperty] = useState<Property | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [draft, setDraft] = useState<BookingDraft | null>(null)
-  const [checkoutOpen, setCheckoutOpen] = useState(false)
-  const [successOpen, setSuccessOpen] = useState(false)
+  const [property,       setProperty]       = useState<Property | null>(null)
+  const [loading,        setLoading]        = useState(true)
+  const [draft,          setDraft]          = useState<BookingDraft | null>(null)
+  const [checkoutOpen,   setCheckoutOpen]   = useState(false)
+  const [successOpen,    setSuccessOpen]    = useState(false)
   const [bookingLoading, setBookingLoading] = useState(false)
   const [confirmedTotal, setConfirmedTotal] = useState(0)
 
@@ -46,23 +44,21 @@ export const PropertyDetailPage = () => {
   const handleConfirm = async (message: string) => {
     if (!property || !draft || !user) return
     setBookingLoading(true)
-    const nights = calcNights(draft.checkinDate, draft.checkoutDate)
-    const subtotal = nights * property.pricePerNight
+    const subtotal   = property.pricePerMonth * draft.durationMonths
     const serviceFee = Math.round(subtotal * 0.14)
-    const total = subtotal + serviceFee
+    const total      = subtotal + serviceFee
     await bookingService.create({
-      propertyId: property.id,
-      tenantId: user.id,
-      hostId: property.hostId,
-      checkinDate: draft.checkinDate,
-      checkoutDate: draft.checkoutDate,
-      guestCount: draft.guestCount,
-      nightCount: nights,
-      pricePerNight: property.pricePerNight,
+      propertyId:    property.id,
+      tenantId:      user.id,
+      hostId:        property.hostId,
+      startMonth:    draft.startMonth,
+      durationMonths: draft.durationMonths,
+      residentCount: draft.residentCount,
+      pricePerMonth: property.pricePerMonth,
       serviceFee,
-      totalAmount: total,
-      currency: 'PEN',
-      guestMessage: message || undefined,
+      totalAmount:   total,
+      currency:      'PEN',
+      guestMessage:  message || undefined,
     })
     setConfirmedTotal(total)
     setBookingLoading(false)
@@ -114,8 +110,8 @@ export const PropertyDetailPage = () => {
         onClose={() => setSuccessOpen(false)}
         propertyTitle={property.title}
         totalAmount={confirmedTotal}
-        checkinDate={draft?.checkinDate ?? ''}
-        checkoutDate={draft?.checkoutDate ?? ''}
+        startMonth={draft?.startMonth ?? ''}
+        durationMonths={draft?.durationMonths ?? 1}
       />
     </div>
   )

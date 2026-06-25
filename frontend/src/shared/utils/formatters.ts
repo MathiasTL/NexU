@@ -16,3 +16,16 @@ export const calcNights = (checkin: string, checkout: string) => {
   const diff = new Date(checkout).getTime() - new Date(checkin).getTime()
   return Math.ceil(diff / (1000 * 60 * 60 * 24))
 }
+
+export const formatMonths = (n: number) => `${n} ${n === 1 ? 'mes' : 'meses'}`
+
+const MONTHS_ES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+]
+
+export const formatYearMonth = (yearMonth: string) => {
+  const [year, m] = yearMonth.split('-')
+  const name = MONTHS_ES[Number(m) - 1] ?? yearMonth
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)} ${year}`
+}

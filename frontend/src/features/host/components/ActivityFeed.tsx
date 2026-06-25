@@ -1,6 +1,6 @@
 import { Calendar } from 'lucide-react'
 import { BookingStatusBadge } from '@/features/bookings/components/BookingStatusBadge'
-import { formatDate, formatCurrency } from '@/shared/utils/formatters'
+import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
 import { PROPERTIES_MOCK } from '@/mock/properties.mock'
 import type { Booking } from '@/features/bookings/types/booking.types'
 
@@ -27,7 +27,7 @@ export const ActivityFeed = ({ bookings }: ActivityFeedProps) => (
                   <p className="text-sm font-medium text-gray-900 line-clamp-1">{property?.title ?? `Propiedad #${booking.propertyId}`}</p>
                   <p className="flex items-center gap-1 text-xs text-gray-500">
                     <Calendar className="h-3 w-3" />
-                    {formatDate(booking.checkinDate)} → {formatDate(booking.checkoutDate)}
+                    {formatYearMonth(booking.startMonth)} · {formatMonths(booking.durationMonths)}
                   </p>
                 </div>
               </div>
