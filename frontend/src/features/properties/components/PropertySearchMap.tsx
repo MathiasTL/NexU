@@ -10,7 +10,13 @@ import {
   CAMPUS_CENTERS,
   campusPathOptions,
 } from '@/shared/data/universityCampuses'
+import {
+  LIMA_TRANSPORT_STOPS,
+  TRANSPORT_COLORS,
+  TRANSPORT_LABELS,
+} from '@/shared/data/limaTransport'
 import type { CampusFeature } from '@/shared/data/universityCampuses'
+import type { TransportStop } from '@/shared/data/limaTransport'
 import type { Property, AvailabilityStatus } from '../types/property.types'
 
 // ─── Tile ─────────────────────────────────────────────────────────────────────
@@ -55,9 +61,6 @@ const createPropertyIcon = (availability: AvailabilityStatus) =>
   })
 
 // ─── University label icon ────────────────────────────────────────────────────
-// iconSize:[0,0] + iconAnchor:[0,0] coloca el punto de anclaje (0×0) en la
-// coordenada exacta.  El div interior usa transform:translate(-50%,-50%) para
-// centrarse sobre ese punto, independientemente del ancho real del texto.
 const createUniversityIcon = (abbr: string) =>
   L.divIcon({
     html: `<div style="
@@ -82,8 +85,30 @@ const createUniversityIcon = (abbr: string) =>
     popupAnchor: [0, -12],
   })
 
+// ─── Transport stop icon ──────────────────────────────────────────────────────
+const TRANSPORT_LETTER: Record<TransportStop['type'], string> = {
+  metropolitano: 'M',
+  tren:          'T',
+  corredor:      'C',
+}
+
+const createTransportIcon = (type: TransportStop['type']) =>
+  L.divIcon({
+    className: '',
+    html: `<div style="
+      background:${TRANSPORT_COLORS[type]};
+      color:white;
+      border-radius:50%;
+      width:20px;height:20px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:10px;font-weight:700;font-family:${FONT};
+      box-shadow:0 1px 3px rgba(0,0,0,.4);
+    ">${TRANSPORT_LETTER[type]}</div>`,
+    iconSize:   [0, 0],
+    iconAnchor: [10, 10],
+  })
+
 // ─── GeoJSON style function ───────────────────────────────────────────────────
-// Distinguishes official boundaries (solid) from approximate ones (dashed).
 const featureStyle = (feature: CampusFeature | undefined) =>
   campusPathOptions(feature?.properties.status ?? 'approximate')
 
@@ -95,13 +120,14 @@ interface PropertySearchMapProps {
 
 export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
   const [showUniversities, setShowUniversities] = useState(true)
+  const [showTransport,    setShowTransport]    = useState(false)
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
   }, [])
 
   return (
-    <div className="relative h-full min-h-[500px]">
+    <div className="relative isolate h-full min-h-[500px]">
       <MapContainer
         center={[LIMA_CENTER.lat, LIMA_CENTER.lng]}
         zoom={LIMA_CENTER.zoom}
@@ -160,15 +186,11 @@ export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
         {/* ── University campus polygons + labels ───────────────────────────── */}
         {showUniversities && (
           <>
-            {/* GeoJSON renders all campus polygons from the single data file */}
             <GeoJSON
-              // key forces remount on data identity change; fine for static data
               key="campus-boundaries"
               data={UNIVERSITY_CAMPUSES as unknown as Parameters<typeof GeoJSON>[0]['data']}
               style={f => featureStyle(f as CampusFeature | undefined)}
             />
-
-            {/* Label badge for each campus — self-centering via CSS transform */}
             {CAMPUS_CENTERS.map(campus => (
               <Marker
                 key={campus.id}
@@ -193,10 +215,30 @@ export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
             ))}
           </>
         )}
+
+        {/* ── Transport stops ───────────────────────────────────────────────── */}
+        {showTransport && LIMA_TRANSPORT_STOPS.map(stop => (
+          <Marker
+            key={stop.id}
+            position={[stop.lat, stop.lng]}
+            icon={createTransportIcon(stop.type)}
+            zIndexOffset={100}
+          >
+            <Popup>
+              <div style={{ fontFamily: FONT }}>
+                <p className="text-xs font-bold text-gray-900">{stop.name}</p>
+                <p className="text-[11px]" style={{ color: TRANSPORT_COLORS[stop.type] }}>
+                  {TRANSPORT_LABELS[stop.type]}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
 
       {/* ── Controls overlay ─────────────────────────────────────────────────── */}
       <div className="absolute bottom-4 left-4 z-[1000] flex flex-col gap-2">
+        {/* University toggle */}
         <button
           onClick={() => setShowUniversities(v => !v)}
           className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium shadow-md transition-colors ${
@@ -213,6 +255,23 @@ export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
           Universidades
         </button>
 
+        {/* Transport toggle */}
+        <button
+          onClick={() => setShowTransport(v => !v)}
+          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium shadow-md transition-colors ${
+            showTransport
+              ? 'bg-red-600 text-white'
+              : 'bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: showTransport ? 'white' : '#DC2626' }}
+          />
+          Transporte
+        </button>
+
+        {/* Legend */}
         <div className="rounded-xl bg-white px-3 py-2 shadow-md">
           <p className="mb-1 text-xs font-semibold text-gray-500">Disponibilidad</p>
           <div className="flex flex-col gap-0.5">
@@ -228,6 +287,26 @@ export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
               ),
             )}
           </div>
+          {showTransport && (
+            <>
+              <p className="mb-1 mt-2 text-xs font-semibold text-gray-500">Transporte</p>
+              <div className="flex flex-col gap-0.5">
+                {(Object.entries(TRANSPORT_COLORS) as [TransportStop['type'], string][]).map(
+                  ([type, color]) => (
+                    <div key={type} className="flex items-center gap-1.5">
+                      <span
+                        className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-bold text-white"
+                        style={{ background: color }}
+                      >
+                        {TRANSPORT_LETTER[type]}
+                      </span>
+                      <span className="text-xs text-gray-600">{TRANSPORT_LABELS[type]}</span>
+                    </div>
+                  ),
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export const RecommendationsPage = () => {
   const navigate = useNavigate()
   const [step,     setStep]     = useState<Step>(0)
   const [loading,  setLoading]  = useState(false)
-  const [results,  setResults]  = useState<{ property: Property; score: number }[]>([])
+  const [results,  setResults]  = useState<{ property: Property; score: number; reasons: string[] }[]>([])
   const [showResults, setShowResults] = useState(false)
 
   const [university,  setUniversity]  = useState('')
@@ -71,7 +71,10 @@ export const RecommendationsPage = () => {
     })
 
     const scored = all
-      .map(p => ({ property: p, score: calcCompatibility(prefs, p).score }))
+      .map(p => {
+        const { score, reasons } = calcCompatibility(prefs, p)
+        return { property: p, score, reasons }
+      })
       .sort((a, b) => b.score - a.score)
 
     setResults(scored)
@@ -99,15 +102,20 @@ export const RecommendationsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {results.map(({ property, score }) => (
+            {results.map(({ property, score, reasons }) => (
               <div key={property.id} className="relative">
                 <PropertyCard property={property} />
                 {score > 0 && (
-                  <div className={cn(
-                    'absolute left-3 bottom-16 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm',
-                    score >= 70 ? 'bg-green-500 text-white' : score >= 40 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
-                  )}>
-                    {score}% compatible
+                  <div className="absolute left-3 right-3 bottom-16">
+                    <span className={cn(
+                      'rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm',
+                      score >= 70 ? 'bg-green-500 text-white' : score >= 40 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                    )}>
+                      {score}% compatible
+                    </span>
+                    {reasons.length > 0 && (
+                      <p className="mt-1 line-clamp-1 text-xs text-gray-500">{reasons.join(' · ')}</p>
+                    )}
                   </div>
                 )}
               </div>
