@@ -77,7 +77,7 @@ export const UniversityCombobox = ({
           <div className="px-3 pb-1 pt-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Universidades en Lima</p>
           </div>
-          <ul className="pb-1.5">
+          <ul className="max-h-56 overflow-y-auto pb-1.5">
             {filtered.map(u => (
               <li key={u}>
                 <button
@@ -130,7 +130,7 @@ export const UniversityCombobox = ({
   return (
     <div ref={wrapperRef} className={cn('relative', className)}>
       <div
-        onClick={() => { setOpen(v => !v); inputRef.current?.focus() }}
+        onClick={() => { setOpen(true); inputRef.current?.focus() }}
         className={cn(
           'flex cursor-text items-center gap-2 rounded-xl border bg-white px-3 py-2.5 transition-colors',
           open ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 hover:border-gray-400',

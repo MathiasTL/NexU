@@ -771,10 +771,10 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 | 1 | Rebranding y sistema visual | ✅ Completa | Paleta NexU coral/azul, copy "estudiante/propietario", Navbar centrada, footer actualizado |
 | 2 | Marketplace estudiantil | ✅ Completa | 8 propiedades Lima, RoomType, pricePerMonth, distancia universidad, filtros por tipo/universidad |
 | 3 | Confianza y mapa semántico | ✅ Completa | Pins por disponibilidad (verde/ámbar/rojo), capa universidades, badges verificado, popups con datos universitarios |
-| 4 | Favoritos y persistencia | ⚠️ Parcial | Favoritos: ✅ completo (Zustand + localStorage). Filtros de búsqueda persistentes entre sesiones: ❌ no implementado |
+| 4 | Favoritos y persistencia | ✅ Completa | Favoritos: ✅ (Zustand + localStorage). Filtros de búsqueda persistentes: ✅ (key `nextu_search_filters_v1`) |
 | 5 | Compatibilidad de roommates | ✅ Completa | LifestylePreferences, algoritmo 100 pts, badge en PropertyCard, PreferencesPage |
 | 6 | Recomendación guiada tipo IA | ✅ Completa | Wizard 4 pasos en /recommendations, resultados ordenados por score de compatibilidad |
-| 7 | Mejoras avanzadas | ❌ Pendiente | Modo oscuro, persistencia de filtros, push notifications |
+| 7 | Mejoras avanzadas | ❌ Pendiente | Modo oscuro, push notifications |
 
 ### Detalle por subsección del plan (6.1–6.14)
 
@@ -790,19 +790,20 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 | 6.8 Detalle de propiedad | Campos universitarios, badge disponibilidad, copy "propietario/personas" | ✅ Completa |
 | 6.9 Publicación de propiedad | Step1 tipos estudiantiles (4 cards), Step2 con UniversityCombobox + slider distancia, Step8 con pricePerMonth + availabilityStatus, Step9 con resumen completo | ✅ Completa |
 | 6.10 Perfil estudiantil y roommates | LifestylePreferences, algoritmo, PreferencesPage, score en cards | ✅ Completa |
-| 6.11 Chat y notificaciones | Copy "propietarios/estudiantes" actualizado | ✅ Completa |
+| 6.11 Chat y notificaciones | Copy "propietarios/estudiantes" actualizado. Mocks de mensajes y notificaciones reescritos en contexto universitario (ciclos académicos, convivencia, alquiler mensual) | ✅ Completa |
 | 6.12 Recomendación guiada | RecommendationsPage wizard 4 pasos, explicación de razones | ✅ Completa |
 | 6.13 Modo oscuro | No implementado | ❌ Pendiente |
-| 6.14 Offline parcial y rendimiento | Favoritos en localStorage ✅; filtros de búsqueda persistentes ❌; lazy loading imágenes ✅ | ⚠️ Parcial |
+| 6.14 Offline parcial y rendimiento | Favoritos en localStorage ✅; filtros de búsqueda persistentes ✅ (key `nextu_search_filters_v1`); lazy loading imágenes ✅ | ✅ Completa |
 
 ---
 
 ## 7. Lo que falta para cerrar el frontend
 
-> **Para la IA que continúe este trabajo:** Esta sección es tu punto de partida.
-> El Paso 2 (frontend mock-first) está casi completo. Los ítems de prioridad alta
-> ya están implementados. Solo quedan los de media y baja. Una vez implementados los
-> de prioridad media, el frontend estará en condiciones de conectarse al backend (Paso 3).
+> **Para la IA que continúe este trabajo:** El Paso 2 (frontend mock-first) está **completo**.
+> Todos los ítems de prioridad alta y media están implementados. El frontend está en
+> condiciones de conectarse al backend (Paso 3). Solo quedan los ítems de prioridad baja
+> (modo oscuro, polígonos oficiales de campus, migración del flujo de booking a mensual),
+> que no bloquean el Paso 3.
 > Puedes leer las secciones 3 y 4 de este documento para entender la estructura de
 > archivos y los contratos de datos exactos antes de tocar cualquier cosa.
 
@@ -884,70 +885,47 @@ el frontend de alquiler turístico a plataforma estudiantil universitaria.
 
 ---
 
-### ⚠️ Pendiente — prioridad media
+### ✅ Completado — prioridad media (implementado 2026-06-25)
 
-Los siguientes ítems mejoran la experiencia pero no bloquean la conexión al backend.
-**Implementar antes de pasar al Paso 3** para evitar retrabajo.
+#### M1 — Persistencia de filtros de búsqueda entre sesiones — **HECHO.**
 
-#### M1 — Persistencia de filtros de búsqueda entre sesiones
+**Archivo modificado:** `src/features/properties/pages/SearchPage.tsx`
 
-**Archivo a modificar:** `src/features/properties/pages/SearchPage.tsx`
-
-**Qué hacer:**
-- Guardar el estado `advFilters`, `roomType` y `query` en `localStorage` con la key
-  `nextu_search_filters_v1` cada vez que cambien.
-- Al montar el componente, leer esa key e inicializar el estado desde ella.
-- Usar `JSON.stringify` / `JSON.parse` con try/catch.
-
-**Ejemplo de código a agregar al inicio del componente:**
-```ts
-// inicializar desde localStorage
-const saved = (() => {
-  try { return JSON.parse(localStorage.getItem('nextu_search_filters_v1') ?? 'null') }
-  catch { return null }
-})()
-const [advFilters, setAdvFilters] = useState<AdvancedFilterValues>(saved?.advFilters ?? DEFAULT_FILTERS)
-const [roomType,   setRoomType]   = useState<RoomType | ''>(saved?.roomType ?? '')
-const [query,      setQuery]      = useState(saved?.query ?? searchParams.get('q') ?? '')
-
-// persistir en cada cambio (usar useEffect)
-useEffect(() => {
-  localStorage.setItem('nextu_search_filters_v1', JSON.stringify({ advFilters, roomType, query }))
-}, [advFilters, roomType, query])
-```
+- Al montar: lee `nextu_search_filters_v1` de localStorage con IIFE + try/catch e inicializa
+  `roomType`, `advFilters` y `query` desde ahí. El param URL `?q=` sigue como último fallback
+  para `query`.
+- `useEffect` dedicado (independiente del efecto de búsqueda) persiste los tres valores en
+  cada cambio: `localStorage.setItem('nextu_search_filters_v1', JSON.stringify({ advFilters, roomType, query }))`.
 
 ---
 
-#### M2 — Actualizar mocks de mensajes y notificaciones al contexto NexU
+#### M2 — Mocks de mensajes y notificaciones en contexto NexU — **HECHO.**
 
-**Archivos a modificar:**
-- `src/mock/messages.mock.ts`
-- `src/mock/notifications.mock.ts`
+**Archivos modificados:** `src/mock/messages.mock.ts`, `src/mock/notifications.mock.ts`
 
-**Qué hacer:**
-- Reemplazar los mensajes y conversaciones genéricas por textos de contexto estudiantil
-  universitario: visitas a habitaciones, dudas sobre convivencia, confirmaciones de
-  disponibilidad, solicitudes de alquiler mensual.
-- Reemplazar las notificaciones genéricas por tipo: `"Nuevo cuarto cerca de la PUCP"`,
-  `"María González solicita ver tu habitación"`, `"Tu reserva fue confirmada"`.
-- **Importante:** mantener la misma estructura de tipos `Message`, `Conversation`,
-  `Notification` — solo cambia el contenido de los arrays mock, no los tipos.
+- **Mensajes:** 3 conversaciones reescritas con contexto universitario — disponibilidad para
+  ciclo 2026-2, servicios incluidos (agua/internet/luz), reglas de convivencia (silencio 11 pm,
+  limpieza rotativa), contratos mensuales. Mismos IDs de usuario y propiedad.
+- **Notificaciones:** 4 notificaciones reescritas — solicitud de alquiler mensual near PUCP,
+  reseña de estudiante en estudio near ULIMA, cuarto compartido reservado para ciclo 2026-2,
+  recordatorio de entrega de llaves. Sin rastro de terminología turística.
+- Interfaces `Message`, `Conversation`, `Notification` sin cambios — solo el contenido de los arrays.
 
 ---
 
-#### M3 — Step 5 del wizard: preparar para upload real de fotos
+#### M3 — Step5 del wizard con previsualización local de fotos — **HECHO.**
 
-**Archivo a modificar:** `src/features/host/wizard/Step5Photos.tsx`
+**Archivos modificados:** `src/features/host/wizard/Step5Photos.tsx`, `src/features/host/types/host.types.ts`
 
-**Qué hacer:**
-- El Step5 actual acepta solo texto de URL. Agregar un `<input type="file" accept="image/*" multiple>`
-  que en modo mock simplemente lea los archivos como `FileReader → base64` o como `object URL`
-  para previsualización local.
-- El estado del wizard puede seguir guardando URLs (strings). En modo mock, esas URLs serán
-  object URLs temporales (`URL.createObjectURL(file)`).
-- Cuando exista backend, el `handleSubmit` del wizard enviará los archivos al endpoint
+- `CreatePropertyDraft` extendido con `images?: string[]`.
+- `Step5Photos.tsx` reescrito: `<input type="file" accept="image/*" multiple>` oculto, activado
+  por clic o drag & drop sobre el área de carga.
+- Previsualización local con `URL.createObjectURL(file)` — sin servidor.
+- Grilla de miniaturas (`grid-cols-3 sm:grid-cols-4`, `aspect-square`, `object-cover`) con
+  botón × por foto para eliminar.
+- Label del botón "Continuar" cambia: `"Continuar sin fotos"` si no hay fotos, `"Continuar"` si hay.
+- Para conectar al backend: el `handleSubmit` del wizard deberá enviar los archivos a
   `POST /properties/upload-images` antes de crear la propiedad.
-- **No conectar a ningún servicio externo todavía.** Solo previsualización local.
 
 ---
 
@@ -1052,9 +1030,9 @@ Marcar como ✅ cuando esté implementado y verificado con `npx tsc --noEmit`:
 - [x] Página de preferencias de convivencia (/account/preferences)
 - [x] Recomendaciones guiadas (/recommendations)
 - [x] Registro 2 pasos (RoleSelector → RegisterForm)
-- [ ] Persistencia de filtros de búsqueda (M1)
-- [ ] Mocks de mensajes y notificaciones actualizados (M2)
-- [ ] Step5 wizard con previsualización de fotos (M3)
+- [x] Persistencia de filtros de búsqueda (M1)
+- [x] Mocks de mensajes y notificaciones actualizados (M2)
+- [x] Step5 wizard con previsualización de fotos (M3)
 
 ---
 
@@ -1069,3 +1047,4 @@ Marcar como ✅ cuando esté implementado y verificado con `npx tsc --noEmit`:
 | 5.0 | 2026-06-25 | Navbar responsive: desktop 3 columnas centradas, mobile con MobileBottomNav (5 tabs, bottom bar fijo). Hamburger eliminado. Mapa: tile CartoDB Positron (minimalista), tipografía Inter en divIcons y popups, zoomControl desactivado. |
 | 6.0 | 2026-06-25 | Título de página corregido de "Smart" a "NexU" (index.html). Mapa revertido a OSM estándar. Tipografía mapa mejorada (Inter, 10px, 600). Bordes de campus universitario con Circle (aproximación circular, ⚠️ parcial — pendiente GeoJSON real en B4). |
 | 7.0 | 2026-06-25 | Refactor completo de campus universitarios en mapa. Nuevo `src/shared/data/universityCampuses.ts` con GeoJSON FeatureCollection tipada para 10 universidades (PUCP, UNMSM, UNI, UPC, ULIMA, UP, USIL, UNFV, UNAC, UPCH). Arquitectura escalable: agregar universidad = 1 entrada en el array, sin tocar lógica. Polígonos distinguen 'official'/'approximate' visualmente. Ícono de label corregido con iconSize:[0,0]+CSS transform para autocentrado independiente del largo del texto. Sigue ⚠️ Parcial por coordenadas aproximadas. |
+| 8.0 | 2026-06-25 | Prioridad media completada. M1: persistencia de filtros de búsqueda en localStorage (key `nextu_search_filters_v1`) en `SearchPage.tsx`. M2: mocks de mensajes y notificaciones reescritos en contexto universitario (ciclos académicos, convivencia, alquiler mensual). M3: `Step5Photos.tsx` reescrito con `<input type="file">`, drag & drop, previsualización local con `URL.createObjectURL` y grilla de miniaturas con botón de eliminación; `CreatePropertyDraft` extendido con `images?`. Paso 2 del frontend **completo**. |

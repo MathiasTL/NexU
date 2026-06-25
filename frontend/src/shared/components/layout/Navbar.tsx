@@ -16,43 +16,40 @@ export const Navbar = () => {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-secondary shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center px-4 py-3">
+    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
+      <div className="mx-auto flex max-w-7xl items-center px-4 py-2">
 
-        {/* Logo — flex-1 para equilibrar el lado derecho */}
+        {/* Logo */}
         <div className="flex flex-1">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-white">N</span>
-            </div>
-            <span className="text-lg font-bold text-white">NexU</span>
+          <Link to="/" className="flex items-center">
+            <img src="/Logo_NexU.png" alt="NexU" className="h-16 w-auto object-contain" />
           </Link>
         </div>
 
-        {/* Desktop nav — solo visible en md+ */}
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          <Link to="/" className="text-sm font-medium text-secondary-200 transition-colors hover:text-primary">
+          <Link to="/" className="text-sm font-medium text-secondary transition-colors hover:text-primary">
             Inicio
           </Link>
-          <Link to="/search" className="text-sm font-medium text-secondary-200 transition-colors hover:text-primary">
+          <Link to="/search" className="text-sm font-medium text-secondary transition-colors hover:text-primary">
             Explorar
           </Link>
-          <Link to="/recommendations" className="text-sm font-medium text-secondary-200 transition-colors hover:text-primary">
+          <Link to="/recommendations" className="text-sm font-medium text-secondary transition-colors hover:text-primary">
             Recomendaciones
           </Link>
         </nav>
 
-        {/* Right side — flex-1 justify-end */}
+        {/* Right side */}
         <div className="flex flex-1 items-center justify-end gap-2">
           {isAuthenticated && user ? (
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(v => !v)}
-                className="flex items-center gap-2 rounded-xl border border-white/20 px-2 py-1.5 text-white transition-colors hover:bg-white/10 md:px-3 md:py-2"
+                className="flex items-center gap-2 rounded-xl border border-gray-200 px-2 py-1.5 text-secondary transition-colors hover:bg-gray-50 md:px-3 md:py-2"
               >
                 <Avatar src={user.avatarUrl} alt={user.firstName} size="sm" />
                 <span className="hidden text-sm font-medium md:block">{user.firstName}</span>
-                <ChevronDown className="hidden h-4 w-4 text-white/60 md:block" />
+                <ChevronDown className="hidden h-4 w-4 text-secondary/50 md:block" />
               </button>
 
               {dropdownOpen && (
@@ -91,10 +88,9 @@ export const Navbar = () => {
               )}
             </div>
           ) : (
-            /* Auth buttons — solo visibles en desktop */
             <div className="hidden items-center gap-2 md:flex">
               <Link to="/login"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10">
+                className="rounded-xl px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary">
                 Iniciar sesión
               </Link>
               <Link to="/register"
@@ -104,7 +100,7 @@ export const Navbar = () => {
             </div>
           )}
 
-          {/* Mobile: botones de acceso cuando no está autenticado */}
+          {/* Mobile: botón de acceso cuando no está autenticado */}
           {!isAuthenticated && (
             <Link to="/login"
               className="rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-600 md:hidden">

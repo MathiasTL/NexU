@@ -16,14 +16,11 @@ export const HostNavbar = () => {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-secondary shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
         <Link to="/host" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-white">N</span>
-          </div>
-          <span className="text-lg font-bold text-white">NexU</span>
-          <span className="rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary-300">
+          <img src="/Logo_NexU.png" alt="NexU" className="h-16 w-auto object-contain" />
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
             Propietario
           </span>
         </Link>
@@ -31,7 +28,7 @@ export const HostNavbar = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-secondary-200 transition-colors hover:bg-white/10"
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
           >
             <Home className="h-4 w-4" />
             Ver como estudiante
@@ -41,11 +38,11 @@ export const HostNavbar = () => {
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(v => !v)}
-                className="flex items-center gap-2 rounded-xl border border-white/20 px-3 py-2 text-white transition-colors hover:bg-white/10"
+                className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-secondary transition-colors hover:bg-gray-50"
               >
                 <Avatar src={user.avatarUrl} alt={user.firstName} size="sm" />
                 <span className="hidden text-sm font-medium md:block">{user.firstName}</span>
-                <ChevronDown className="h-4 w-4 text-white/60" />
+                <ChevronDown className="h-4 w-4 text-secondary/50" />
               </button>
               {dropdownOpen && (
                 <>

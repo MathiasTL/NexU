@@ -12,9 +12,7 @@ export const RegisterPage = () => {
       {/* Wider container when showing RoleSelector so cards go side-by-side */}
       <div className={role === null ? 'w-full max-w-lg' : 'w-full max-w-sm'}>
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-lg">
-            <span className="text-xl font-bold text-white">N</span>
-          </div>
+          <img src="/Logo_NexU.png" alt="NexU" className="mx-auto mb-3 h-24 w-auto object-contain" />
           <h1 className="text-2xl font-bold text-gray-900">
             {role ? 'Crea tu cuenta' : 'Únete a NexU'}
           </h1>

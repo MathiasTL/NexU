@@ -27,11 +27,20 @@ export const SearchPage = () => {
   const [loading,      setLoading]       = useState(true)
   const [showMap,      setShowMap]       = useState(true)
   const [showAdvanced, setShowAdvanced]  = useState(false)
-  const [roomType,     setRoomType]      = useState<RoomType | ''>('')
-  const [advFilters,   setAdvFilters]    = useState<AdvancedFilterValues>(DEFAULT_FILTERS)
 
-  const [query, setQuery] = useState(searchParams.get('q') ?? '')
-  const debouncedQuery    = useDebounce(query, 400)
+  const saved = (() => {
+    try { return JSON.parse(localStorage.getItem('nextu_search_filters_v1') ?? 'null') }
+    catch { return null }
+  })()
+
+  const [roomType,   setRoomType]   = useState<RoomType | ''>(saved?.roomType ?? '')
+  const [advFilters, setAdvFilters] = useState<AdvancedFilterValues>(saved?.advFilters ?? DEFAULT_FILTERS)
+  const [query,      setQuery]      = useState(saved?.query ?? searchParams.get('q') ?? '')
+  const debouncedQuery              = useDebounce(query, 400)
+
+  useEffect(() => {
+    localStorage.setItem('nextu_search_filters_v1', JSON.stringify({ advFilters, roomType, query }))
+  }, [advFilters, roomType, query])
 
   useEffect(() => {
     setLoading(true)

@@ -6,11 +6,8 @@ const Footer = () => (
   <footer className="hidden border-t border-gray-100 bg-secondary py-10 mt-12 md:block">
     <div className="mx-auto max-w-7xl px-4">
       <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-            <span className="text-xs font-bold text-white">N</span>
-          </div>
-          <span className="text-sm font-semibold text-white">NexU</span>
+        <div className="flex items-center">
+          <img src="/Logo_NexU.png" alt="NexU" className="h-20 w-auto object-contain brightness-0 invert" />
         </div>
         <p className="text-sm text-secondary-200">© 2026 NexU. Plataforma de alojamiento universitario en Perú.</p>
         <div className="flex gap-5 text-sm text-secondary-300">
