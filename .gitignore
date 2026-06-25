@@ -34,6 +34,9 @@ Thumbs.db
 .idea/
 *.swp
 
+# ── Configuracion local de agentes ────────────
+.opencode/
+
 # ── Python ────────────────────────────────────
 *.pyo
 .mypy_cache/
