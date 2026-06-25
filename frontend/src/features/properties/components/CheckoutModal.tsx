@@ -43,7 +43,7 @@ export const CheckoutModal = ({ open, onClose, property, draft, onConfirm, loadi
         <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
           <p className="font-medium text-gray-900">{property.title}</p>
           <p className="mt-1 text-sm text-gray-500">
-            {draft.checkinDate} → {draft.checkoutDate} · {formatNights(nights)} · {draft.guestCount} {draft.guestCount === 1 ? 'huésped' : 'huéspedes'}
+            {draft.checkinDate} → {draft.checkoutDate} · {formatNights(nights)} · {draft.guestCount} {draft.guestCount === 1 ? 'persona' : 'personas'}
           </p>
           <div className="mt-2 flex flex-col gap-1 text-sm">
             <div className="flex justify-between text-gray-600">
@@ -103,14 +103,14 @@ export const CheckoutModal = ({ open, onClose, property, draft, onConfirm, loadi
 
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            Mensaje para el anfitrión (opcional)
+            Mensaje para el propietario (opcional)
           </label>
           <textarea
             value={message}
             onChange={e => setMessage(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             rows={2}
-            placeholder="Cuéntale algo al anfitrión..."
+            placeholder="Cuéntale algo al propietario sobre ti..."
           />
         </div>
 

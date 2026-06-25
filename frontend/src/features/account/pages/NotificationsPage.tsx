@@ -41,7 +41,7 @@ export const NotificationsPage = () => {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">
-          Notificaciones {unreadCount > 0 && <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-sm text-blue-700">{unreadCount}</span>}
+          Notificaciones {unreadCount > 0 && <span className="ml-2 rounded-full bg-primary-100 px-2 py-0.5 text-sm text-primary-600">{unreadCount}</span>}
         </h2>
         {unreadCount > 0 && (
           <Button variant="ghost" size="sm" onClick={markAllRead}>
@@ -64,17 +64,17 @@ export const NotificationsPage = () => {
               onClick={() => !n.read && markRead(n.id)}
               className={cn(
                 'cursor-pointer rounded-2xl border p-4 transition-colors',
-                n.read ? 'border-gray-100 bg-white' : 'border-blue-100 bg-blue-50'
+                n.read ? 'border-gray-100 bg-white' : 'border-primary-100 bg-primary-50'
               )}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className={cn('font-medium', n.read ? 'text-gray-700' : 'text-blue-900')}>{n.title}</p>
+                  <p className={cn('font-medium', n.read ? 'text-gray-700' : 'text-secondary')}>{n.title}</p>
                   <p className="mt-0.5 text-sm text-gray-500">{n.message}</p>
                   <p className="mt-1 text-xs text-gray-400">{formatDateTime(n.createdAt)}</p>
                 </div>
                 {!n.read && (
-                  <div className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-600" />
+                  <div className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
                 )}
               </div>
             </div>

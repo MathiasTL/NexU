@@ -24,7 +24,7 @@ export const PropertyGallery = ({ images, title }: PropertyGalleryProps) => {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={cn('h-16 w-24 shrink-0 overflow-hidden rounded-xl transition-opacity', i === active ? 'ring-2 ring-blue-500 opacity-100' : 'opacity-60 hover:opacity-80')}
+              className={cn('h-16 w-24 shrink-0 overflow-hidden rounded-xl transition-opacity', i === active ? 'ring-2 ring-primary opacity-100' : 'opacity-60 hover:opacity-80')}
             >
               <img src={img} alt={`miniatura ${i + 1}`} className="h-full w-full object-cover" />
             </button>

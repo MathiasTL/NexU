@@ -34,7 +34,7 @@ export const Step4Amenities = ({ draft, update, onNext, onPrev }: StepProps) => 
                   className={cn(
                     'rounded-xl border px-3 py-2 text-left text-sm transition-all',
                     draft.amenities.includes(amenity.id)
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      ? 'border-primary bg-primary-50 text-primary-600'
                       : 'border-gray-200 text-gray-700 hover:border-gray-300'
                   )}
                 >

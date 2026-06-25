@@ -21,6 +21,11 @@ import { ProfilePage } from '@/features/account/pages/ProfilePage'
 import { PersonalInfoPage } from '@/features/account/pages/PersonalInfoPage'
 import { NotificationsPage } from '@/features/account/pages/NotificationsPage'
 import { MessagesPage } from '@/features/account/pages/MessagesPage'
+import { FavoritesPage } from '@/features/account/pages/FavoritesPage'
+import { PreferencesPage } from '@/features/account/pages/PreferencesPage'
+
+// Recommendations
+import { RecommendationsPage } from '@/features/recommendations/pages/RecommendationsPage'
 
 // Host pages
 import { HostDashboardPage } from '@/features/host/pages/HostDashboardPage'
@@ -33,7 +38,7 @@ const NotFoundPage = () => (
   <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
     <h1 className="text-4xl font-bold text-gray-900">404</h1>
     <p className="text-gray-500">Página no encontrada</p>
-    <a href="/" className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">Volver al inicio</a>
+    <a href="/" className="rounded-xl bg-primary px-4 py-2 text-sm text-white hover:bg-primary-600">Volver al inicio</a>
   </div>
 )
 
@@ -61,8 +66,11 @@ export const router = createBrowserRouter([
           { path: 'bookings', element: <MyBookingsPage /> },
           { path: 'notifications', element: <NotificationsPage /> },
           { path: 'messages', element: <MessagesPage /> },
+          { path: 'favorites', element: <FavoritesPage /> },
+          { path: 'preferences', element: <PreferencesPage /> },
         ],
       },
+      { path: 'recommendations', element: <RecommendationsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

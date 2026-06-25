@@ -1,9 +1,14 @@
+export type RoomType = 'room' | 'apartment' | 'shared' | 'studio'
+export type AvailabilityStatus = 'available' | 'reserved' | 'unavailable'
+
 export interface Property {
   id: number
   hostId: number
   title: string
   description: string
   shortDescription: string
+  roomType: RoomType
+  pricePerMonth: number
   pricePerNight: number
   currency: 'PEN'
   location: string
@@ -24,16 +29,28 @@ export interface Property {
   checkoutTime: string
   houseRules: string[]
   status: 'active' | 'inactive'
+  availabilityStatus: AvailabilityStatus
+  verifiedHost: boolean
+  nearestUniversity: string
+  distanceToUniversityMinutes: number
   createdAt: string
 }
 
 export interface PropertySearchFilters {
   district?: string
+  roomType?: RoomType
+  nearestUniversity?: string
+  minPricePerMonth?: number
+  maxPricePerMonth?: number
   minPrice?: number
   maxPrice?: number
   capacity?: number
   amenities?: string[]
   query?: string
+  // filtros de convivencia (mapeados desde AdvancedFilters)
+  petsAllowed?: boolean      // true → propiedad debe tener PETS_ALLOWED en amenities
+  quietHours?: boolean       // true → propiedad debe tener QUIET_HOURS en amenities
+  hasWorkspace?: boolean     // true → propiedad debe tener WORKSPACE en amenities
 }
 
 export interface BookingDraft {

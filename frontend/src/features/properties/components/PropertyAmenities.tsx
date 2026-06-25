@@ -27,7 +27,7 @@ export const PropertyAmenities = ({ amenities }: PropertyAmenitiesProps) => {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {activeAmenities.map(amenity => (
           <div key={amenity.id} className="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-2.5">
-            <span className="text-blue-500">
+            <span className="text-primary">
               <DynamicIcon name={amenity.icon} />
             </span>
             <span className="text-sm text-gray-700">{amenity.name}</span>

@@ -63,7 +63,7 @@ export const MessagesPage = () => {
         <EmptyState
           icon={<MessageSquare className="h-12 w-12" />}
           title="Sin mensajes"
-          description="Tus conversaciones con anfitriones y huéspedes aparecerán aquí."
+          description="Tus conversaciones con propietarios y estudiantes aparecerán aquí."
         />
       ) : (
         <div className="flex gap-4 overflow-hidden rounded-2xl border border-gray-100" style={{ height: '500px' }}>
@@ -79,7 +79,7 @@ export const MessagesPage = () => {
                   onClick={() => setSelected(conv)}
                   className={cn(
                     'flex w-full items-start gap-3 border-b border-gray-100 px-3 py-3 text-left hover:bg-gray-50',
-                    selected?.id === conv.id && 'bg-blue-50'
+                    selected?.id === conv.id && 'bg-primary-50'
                   )}
                 >
                   <Avatar src={other?.avatarUrl} alt={other?.firstName} size="sm" />
@@ -106,9 +106,9 @@ export const MessagesPage = () => {
                     key={msg.id}
                     className={cn('flex', msg.senderId === user?.id ? 'justify-end' : 'justify-start')}
                   >
-                    <div className={cn('max-w-[70%] rounded-2xl px-4 py-2 text-sm', msg.senderId === user?.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900')}>
+                    <div className={cn('max-w-[70%] rounded-2xl px-4 py-2 text-sm', msg.senderId === user?.id ? 'bg-primary text-white' : 'bg-gray-100 text-gray-900')}>
                       <p>{msg.text}</p>
-                      <p className={cn('mt-1 text-xs', msg.senderId === user?.id ? 'text-blue-200' : 'text-gray-400')}>
+                      <p className={cn('mt-1 text-xs', msg.senderId === user?.id ? 'text-primary-100' : 'text-gray-400')}>
                         {formatDateTime(msg.createdAt)}
                       </p>
                     </div>
@@ -120,12 +120,12 @@ export const MessagesPage = () => {
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   placeholder="Escribe un mensaje..."
-                  className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary"
                 />
                 <button
                   type="submit"
                   disabled={sending || !newMessage.trim()}
-                  className="flex items-center gap-1 rounded-xl bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-sm text-white hover:bg-primary-600 disabled:opacity-50"
                 >
                   <Send className="h-4 w-4" />
                 </button>

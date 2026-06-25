@@ -53,7 +53,7 @@ export const HostReservationsPage = () => {
               onClick={() => setActiveFilter(f.key)}
               className={`shrink-0 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeFilter === f.key
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary text-white'
                   : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >

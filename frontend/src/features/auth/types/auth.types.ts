@@ -21,4 +21,5 @@ export interface AuthUser {
   phone: string
   bio: string
   createdAt: string
+  lifestylePreferences?: import('@/features/account/types/account.types').LifestylePreferences
 }

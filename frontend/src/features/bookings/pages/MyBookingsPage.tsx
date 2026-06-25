@@ -50,7 +50,7 @@ export const MyBookingsPage = () => {
             onClick={() => setActiveTab(tab.key)}
             className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? 'bg-blue-600 text-white'
+                ? 'bg-primary text-white'
                 : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >

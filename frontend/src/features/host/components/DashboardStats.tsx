@@ -12,7 +12,7 @@ export const DashboardStats = ({ stats }: DashboardStatsProps) => {
       label: 'Total reservas',
       value: stats.totalBookings.toString(),
       icon: Bookmark,
-      color: 'bg-blue-50 text-blue-600',
+      color: 'bg-primary-50 text-primary-600',
     },
     {
       label: 'Ingresos totales',

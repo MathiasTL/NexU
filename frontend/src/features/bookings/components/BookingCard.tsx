@@ -31,7 +31,7 @@ export const BookingCard = ({ booking, onSelect }: BookingCardProps) => {
             <Link
               to={`/properties/${booking.propertyId}`}
               onClick={e => e.stopPropagation()}
-              className="font-semibold text-gray-900 hover:text-blue-600 line-clamp-1"
+              className="font-semibold text-gray-900 hover:text-primary line-clamp-1"
             >
               {property?.title ?? `Propiedad #${booking.propertyId}`}
             </Link>

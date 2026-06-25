@@ -20,12 +20,12 @@ export const PropertyHostInfo = ({ hostId }: PropertyHostInfoProps) => {
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-      <h3 className="mb-3 font-semibold text-gray-900">Sobre el anfitrión</h3>
+      <h3 className="mb-3 font-semibold text-gray-900">Sobre el propietario</h3>
       <div className="flex items-start gap-4">
         <Avatar src={host.avatarUrl} alt={host.firstName} size="lg" />
         <div>
           <p className="font-semibold text-gray-900">{host.firstName} {host.lastName}</p>
-          <p className="text-xs text-gray-500">Anfitrión desde {formatDate(host.createdAt)}</p>
+          <p className="text-xs text-gray-500">Propietario desde {formatDate(host.createdAt)}</p>
           {host.bio && <p className="mt-2 text-sm text-gray-600">{host.bio}</p>}
         </div>
       </div>

@@ -9,11 +9,12 @@ interface AuthState {
   isLoading: boolean
   login: (email: string, password: string) => Promise<AuthUser>
   logout: () => void
+  setAuthUser: (user: AuthUser) => void
 }
 
 export const AuthContext = createContext<AuthState | null>(null)
 
-const STORAGE_KEY = 'smart_user'
+const STORAGE_KEY = 'nextu_user'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -43,8 +44,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem(STORAGE_KEY)
   }, [])
 
+  const setAuthUser = useCallback((updatedUser: AuthUser) => {
+    setUser(updatedUser)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser))
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, setAuthUser }}>
       {children}
     </AuthContext.Provider>
   )
