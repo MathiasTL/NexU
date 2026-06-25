@@ -254,7 +254,7 @@ export const RecommendationsPage = () => {
         <button
           onClick={() => step > 0 && setStep(s => (s - 1) as Step)}
           disabled={step === 0}
-          className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 disabled:opacity-30 dark:text-gray-400 dark:hover:text-gray-200"
+          className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 disabled:opacity-30 dark:text-gray-200 dark:hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" /> Atrás
         </button>
