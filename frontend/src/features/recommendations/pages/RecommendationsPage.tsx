@@ -265,7 +265,7 @@ export const RecommendationsPage = () => {
       </div>
 
       <button onClick={() => navigate('/search')}
-        className="mt-4 w-full text-center text-sm text-gray-400 hover:text-gray-600 hover:underline dark:text-gray-500 dark:hover:text-gray-300">
+        className="mt-4 hidden w-full text-center text-sm text-gray-400 hover:text-gray-600 hover:underline dark:text-gray-500 dark:hover:text-gray-300 md:block">
         Prefiero buscar por mi cuenta →
       </button>
     </div>
