@@ -21,7 +21,7 @@ export const FavoritesPage = () => {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-gray-900">Favoritos</h1>
+      <h1 className="mb-6 text-xl font-bold text-gray-900 dark:text-white">Favoritos</h1>
 
       {loading ? (
         <LoadingSkeleton count={4} />
