@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal, Map, List } from 'lucide-react'
 import { propertyService } from '../services/property.service'
 import { PropertyCard } from '../components/PropertyCard'
 import { PropertySearchMap } from '../components/PropertySearchMap'
@@ -82,12 +82,12 @@ export const SearchPage = () => {
   ].filter(Boolean).length
 
   return (
-    <div className="fixed inset-x-0 bottom-14 top-[65px] flex overflow-hidden md:bottom-0">
+    <div className="fixed inset-x-0 bottom-12 top-[65px] flex overflow-hidden md:relative md:inset-auto md:h-[calc(100vh-65px)]">
       {/* Left panel */}
-      <div className="flex w-full flex-col md:w-[55%] lg:w-[50%]">
+      <div className={cn('flex w-full flex-col md:overflow-y-auto md:transition-all md:duration-300 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden', showMap ? 'md:w-[55%] lg:w-[50%]' : 'md:w-full')}>
 
         {/* Search bar */}
-        <div className="shrink-0 border-b border-gray-100 bg-white px-4 pb-4 pt-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="shrink-0 border-b border-gray-100 bg-white px-4 pb-4 pt-6 dark:border-gray-800 dark:bg-gray-900 md:sticky md:top-0 md:z-10">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               value={query}
@@ -103,6 +103,14 @@ export const SearchPage = () => {
                 </span>
               )}
             </Button>
+            <button
+              type="button"
+              onClick={() => setShowMap(v => !v)}
+              className="hidden items-center gap-1.5 rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 md:flex"
+            >
+              {showMap ? <List className="h-4 w-4" /> : <Map className="h-4 w-4" />}
+              {showMap ? 'Lista' : 'Mapa'}
+            </button>
           </form>
 
           {/* Room type chips */}
@@ -125,13 +133,13 @@ export const SearchPage = () => {
         </div>
 
         {/* Results */}
-        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 md:flex-none md:overflow-visible">
           {loading ? (
             <LoadingSkeleton count={4} />
           ) : properties.length === 0 ? (
             <EmptyState title="Sin resultados" description="Prueba con otros filtros o términos de búsqueda." />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className={cn('grid grid-cols-1 gap-4 sm:grid-cols-2', !showMap && 'md:grid-cols-4')}>
               {properties.map(p => <PropertyCard key={p.id} property={p} />)}
             </div>
           )}
@@ -139,7 +147,7 @@ export const SearchPage = () => {
       </div>
 
       {/* Map */}
-      <div className={`hidden flex-1 border-l border-gray-100 md:block dark:border-gray-800 ${showMap ? '' : 'hidden'}`}>
+      <div className={cn('hidden flex-1 border-l border-gray-100 dark:border-gray-800', showMap && 'md:block')}>
         <PropertySearchMap properties={properties} />
       </div>
 
