@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { SlidersHorizontal, Map, List } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { propertyService } from '../services/property.service'
 import { PropertyCard } from '../components/PropertyCard'
 import { PropertySearchMap } from '../components/PropertySearchMap'
@@ -82,12 +82,12 @@ export const SearchPage = () => {
   ].filter(Boolean).length
 
   return (
-    <div className="flex h-[calc(100vh-65px)] overflow-hidden">
+    <div className="fixed inset-x-0 bottom-14 top-[65px] flex overflow-hidden md:bottom-0">
       {/* Left panel */}
-      <div className="flex w-full flex-col overflow-y-auto md:w-[55%] lg:w-[50%]">
+      <div className="flex w-full flex-col md:w-[55%] lg:w-[50%]">
 
         {/* Search bar */}
-        <div className="sticky top-0 z-10 border-b border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+        <div className="shrink-0 border-b border-gray-100 bg-white px-4 pb-4 pt-6 dark:border-gray-800 dark:bg-gray-900">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               value={query}
@@ -103,14 +103,10 @@ export const SearchPage = () => {
                 </span>
               )}
             </Button>
-            <button type="button" onClick={() => setShowMap(v => !v)}
-              className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 md:hidden">
-              {showMap ? <List className="h-4 w-4" /> : <Map className="h-4 w-4" />}
-            </button>
           </form>
 
           {/* Room type chips */}
-          <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1">
+          <div className="mt-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {ROOM_TYPES.map(rt => (
               <button key={rt.value} onClick={() => setRoomType(rt.value)}
                 className={cn(
@@ -129,7 +125,7 @@ export const SearchPage = () => {
         </div>
 
         {/* Results */}
-        <div className="p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {loading ? (
             <LoadingSkeleton count={4} />
           ) : properties.length === 0 ? (
