@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { propertyService } from '../services/property.service'
 import { bookingService } from '@/features/bookings/services/booking.service'
 import { useAuth } from '@/core/auth/useAuth'
@@ -13,6 +14,8 @@ import { PropertyHostInfo } from '../components/PropertyHostInfo'
 import { CheckoutModal } from '../components/CheckoutModal'
 import { SuccessModal } from '../components/SuccessModal'
 import { Spinner } from '@/shared/components/ui/Spinner'
+import { Button } from '@/shared/components/ui/Button'
+import { formatCurrency } from '@/shared/utils/formatters'
 import type { Property, BookingDraft } from '../types/property.types'
 
 export const PropertyDetailPage = () => {
@@ -39,6 +42,12 @@ export const PropertyDetailPage = () => {
   const handleBook = (d: BookingDraft) => {
     setDraft(d)
     setCheckoutOpen(true)
+  }
+
+  const handleMobileBook = () => {
+    const start = new Date()
+    start.setDate(1)
+    handleBook({ startMonth: start.toISOString().slice(0, 7), durationMonths: 1, residentCount: 1 })
   }
 
   const handleConfirm = async (message: string) => {
@@ -74,24 +83,52 @@ export const PropertyDetailPage = () => {
 
   if (!property) return null
 
+  const isUnavailable = property.availabilityStatus === 'unavailable'
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <PropertyGallery images={property.images} title={property.title} />
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="flex flex-col gap-8">
-          <PropertyBasicInfo property={property} />
-          <hr className="border-gray-100" />
-          <PropertyHostInfo hostId={property.hostId} />
-          <hr className="border-gray-100" />
-          <PropertyAmenities amenities={property.amenities} />
-          <hr className="border-gray-100" />
-          <PropertyHouseRules property={property} />
-          <hr className="border-gray-100" />
-          <PropertyReviews propertyId={property.id} />
+    <div className="mx-auto max-w-7xl pb-28 lg:px-4 lg:py-6 lg:pb-8">
+
+      {/* Galería — full-bleed en móvil, con botón flotante */}
+      <div className="relative">
+        <PropertyGallery images={property.images} title={property.title} />
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm backdrop-blur-sm transition hover:bg-white dark:bg-gray-900/80 dark:text-white dark:hover:bg-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Volver
+        </button>
+      </div>
+
+      {/* Contenido */}
+      <div className="px-4 lg:px-0">
+        <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="flex flex-col gap-6">
+            <PropertyBasicInfo property={property} />
+            <hr className="border-gray-100 dark:border-gray-800" />
+            <PropertyHostInfo hostId={property.hostId} />
+            <hr className="border-gray-100 dark:border-gray-800" />
+            <PropertyAmenities amenities={property.amenities} />
+            <hr className="border-gray-100 dark:border-gray-800" />
+            <PropertyHouseRules property={property} />
+            <hr className="border-gray-100 dark:border-gray-800" />
+            <PropertyReviews propertyId={property.id} />
+          </div>
+          <div className="hidden lg:block">
+            <PropertyBookingCard property={property} onBook={handleBook} />
+          </div>
         </div>
+      </div>
+
+      {/* Footer sticky — solo móvil */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between border-t border-gray-200 bg-white px-5 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] dark:border-gray-700 dark:bg-gray-900 lg:hidden">
         <div>
-          <PropertyBookingCard property={property} onBook={handleBook} />
+          <p className="text-xs text-gray-500 dark:text-gray-400">por mes</p>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
         </div>
+        <Button onClick={handleMobileBook} disabled={isUnavailable}>
+          {isUnavailable ? 'No disponible' : 'Reservar ahora'}
+        </Button>
       </div>
 
       {draft && (
