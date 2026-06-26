@@ -41,10 +41,10 @@ export const PropertyBasicInfo = ({ property }: PropertyBasicInfoProps) => {
       </div>
 
       {/* Title */}
-      <h1 className="mb-2 text-2xl font-bold text-gray-900">{property.title}</h1>
+      <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{property.title}</h1>
 
       {/* Location + rating + university */}
-      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
         <span className="flex items-center gap-1">
           <MapPin className="h-4 w-4 shrink-0" />
           {property.district}, {property.city}
@@ -64,33 +64,28 @@ export const PropertyBasicInfo = ({ property }: PropertyBasicInfoProps) => {
 
       {/* Price highlight */}
       <div className="mb-4 flex items-baseline gap-2">
-        <span className="text-3xl font-bold text-gray-900">{formatCurrency(property.pricePerMonth)}</span>
-        <span className="text-gray-500">/ mes</span>
-        <span className="ml-2 text-sm text-gray-400">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
+        <span className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
+        <span className="text-gray-500 dark:text-gray-400">/ mes</span>
+        <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
       </div>
 
-      {/* Stats grid */}
-      <div className="mb-4 flex flex-wrap gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-        <span className="flex items-center gap-2 text-sm text-gray-700">
-          <Users className="h-4 w-4 text-primary" />
-          {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
-        </span>
-        <span className="flex items-center gap-2 text-sm text-gray-700">
-          <BedDouble className="h-4 w-4 text-primary" />
-          {property.bedrooms} {property.bedrooms === 1 ? 'habitación' : 'habitaciones'} · {property.beds} {property.beds === 1 ? 'cama' : 'camas'}
-        </span>
-        <span className="flex items-center gap-2 text-sm text-gray-700">
-          <Bath className="h-4 w-4 text-primary" />
-          {property.bathrooms} {property.bathrooms === 1 ? 'baño' : 'baños'}
-        </span>
-        <span className="flex items-center gap-2 text-sm text-gray-700">
-          <Clock className="h-4 w-4 text-primary" />
-          Disponible desde las {property.checkinTime}
-        </span>
+      {/* Stats grid — 2×2 en móvil, fila en sm+ */}
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {[
+          { Icon: Users,     text: `${property.capacity} ${property.capacity === 1 ? 'persona' : 'personas'}` },
+          { Icon: BedDouble, text: `${property.bedrooms} ${property.bedrooms === 1 ? 'hab.' : 'habs.'} · ${property.beds} ${property.beds === 1 ? 'cama' : 'camas'}` },
+          { Icon: Bath,      text: `${property.bathrooms} ${property.bathrooms === 1 ? 'baño' : 'baños'}` },
+          { Icon: Clock,     text: `Desde las ${property.checkinTime}` },
+        ].map(({ Icon, text }) => (
+          <div key={text} className="flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            <Icon className="h-4 w-4 shrink-0 text-primary" />
+            <span className="leading-tight">{text}</span>
+          </div>
+        ))}
       </div>
 
       {/* Description */}
-      <p className="leading-relaxed text-gray-600">{property.description}</p>
+      <p className="leading-relaxed text-gray-600 dark:text-gray-400">{property.description}</p>
     </div>
   )
 }

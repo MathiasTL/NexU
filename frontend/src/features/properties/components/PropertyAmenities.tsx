@@ -23,7 +23,7 @@ export const PropertyAmenities = ({ amenities }: PropertyAmenitiesProps) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">Lo que ofrece este lugar</h2>
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Lo que ofrece este lugar</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {activeAmenities.map(amenity => (
           <div key={amenity.id} className="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-2.5">
