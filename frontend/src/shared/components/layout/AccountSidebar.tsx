@@ -27,27 +27,27 @@ export const AccountSidebar = () => {
   ]
 
   return (
-    <aside className="w-64 shrink-0">
-      <nav className="flex flex-col gap-1">
+    <aside className="w-full shrink-0 md:w-64">
+      <nav className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-x-visible md:pb-0">
         {links.map(({ to, icon: Icon, label, badge }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
               cn(
-                'flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                'flex shrink-0 items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-primary-50 text-primary-600 dark:bg-primary/10 dark:text-primary'
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
               )
             }
           >
-            <span className="flex items-center gap-3">
-              <Icon className="h-4 w-4" />
-              {label}
+            <span className="flex items-center gap-2">
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="whitespace-nowrap">{label}</span>
             </span>
             {badge !== undefined && badge > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+              <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                 {badge}
               </span>
             )}
