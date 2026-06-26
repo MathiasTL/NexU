@@ -24,7 +24,7 @@ export const MainLayout = () => (
   <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900">
     <Navbar />
     {/* pb-16 en mobile para que el contenido no quede tapado por el bottom nav */}
-    <main className="flex-1 pb-16 md:pb-0">
+    <main className="flex-1 pb-12 md:pb-0">
       <Outlet />
     </main>
     <Footer />

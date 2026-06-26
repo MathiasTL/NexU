@@ -26,7 +26,7 @@ export const MobileBottomNav = () => {
       className="fixed bottom-0 left-0 right-0 z-[900] border-t border-gray-100 bg-white md:hidden dark:border-gray-800 dark:bg-gray-900"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex h-14 items-stretch">
+      <div className="flex h-12 items-stretch">
         {links.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
