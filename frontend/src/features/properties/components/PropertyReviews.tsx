@@ -25,11 +25,11 @@ export const PropertyReviews = ({ propertyId }: PropertyReviewsProps) => {
 
   return (
     <div>
-      <h2 className="mb-6 text-xl font-semibold text-gray-900">Reseñas</h2>
+      <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">Reseñas</h2>
       <div className="mb-6">
         <ReviewStats reviews={reviews} />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="flex flex-col gap-3">
         {reviews.map(review => (
           <ReviewCard key={review.id} review={review} />
         ))}
