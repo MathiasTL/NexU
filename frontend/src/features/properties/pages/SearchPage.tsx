@@ -33,9 +33,10 @@ export const SearchPage = () => {
     catch { return null }
   })()
 
-  const [roomType,   setRoomType]   = useState<RoomType | ''>(saved?.roomType ?? '')
+  // URL params tienen precedencia sobre localStorage
+  const [roomType,   setRoomType]   = useState<RoomType | ''>((searchParams.get('roomType') as RoomType | null) ?? saved?.roomType ?? '')
   const [advFilters, setAdvFilters] = useState<AdvancedFilterValues>(saved?.advFilters ?? DEFAULT_FILTERS)
-  const [query,      setQuery]      = useState(saved?.query ?? searchParams.get('q') ?? '')
+  const [query,      setQuery]      = useState(searchParams.get('q') ?? saved?.query ?? '')
   const debouncedQuery              = useDebounce(query, 400)
 
   useEffect(() => {
@@ -62,7 +63,18 @@ export const SearchPage = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    setSearchParams(query ? { q: query } : {})
+    setSearchParams(prev => {
+      if (query) prev.set('q', query); else prev.delete('q')
+      return prev
+    })
+  }
+
+  const handleRoomTypeChange = (value: RoomType | '') => {
+    setRoomType(value)
+    setSearchParams(prev => {
+      if (value) prev.set('roomType', value); else prev.delete('roomType')
+      return prev
+    })
   }
 
   const handleApplyAdvanced = (values: AdvancedFilterValues) => {
@@ -116,7 +128,7 @@ export const SearchPage = () => {
           {/* Room type chips */}
           <div className="mt-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {ROOM_TYPES.map(rt => (
-              <button key={rt.value} onClick={() => setRoomType(rt.value)}
+              <button key={rt.value} onClick={() => handleRoomTypeChange(rt.value)}
                 className={cn(
                   'shrink-0 rounded-full px-3 py-2 text-xs font-medium transition-colors',
                   roomType === rt.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
