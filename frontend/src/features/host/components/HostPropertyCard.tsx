@@ -21,7 +21,7 @@ export const HostPropertyCard = ({ property }: HostPropertyCardProps) => (
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-gray-900">{formatCurrency(property.pricePerNight)}<span className="text-xs font-normal text-gray-500">/noche</span></span>
+          <span className="font-semibold text-gray-900">{formatCurrency(property.pricePerMonth)}<span className="text-xs font-normal text-gray-500">/mes</span></span>
           {property.rating > 0 && (
             <span className="flex items-center gap-1 text-xs text-gray-600">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
