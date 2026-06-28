@@ -75,7 +75,7 @@ export const LoginForm = () => {
       <GoogleButton disabled />
 
       <div className="rounded-xl border border-primary-100 bg-primary-50 p-3 text-xs text-primary-700">
-        <strong>Demo:</strong> maria@example.com / 123456 (estudiante) · carlos@example.com / 123456 (propietario)
+        <strong>Demo:</strong> ana.garcia@pucp.pe / password123 (estudiante) · carlos.mendoza@gmail.com / password123 (propietario)
       </div>
     </form>
   )
