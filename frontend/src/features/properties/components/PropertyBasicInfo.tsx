@@ -66,7 +66,9 @@ export const PropertyBasicInfo = ({ property }: PropertyBasicInfoProps) => {
       <div className="mb-4 flex items-baseline gap-2">
         <span className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
         <span className="text-gray-500 dark:text-gray-400">/ mes</span>
-        <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
+        {property.pricePerNight > 0 && (
+          <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
+        )}
       </div>
 
       {/* Stats grid — 2×2 en móvil, fila en sm+ */}
