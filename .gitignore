@@ -45,3 +45,6 @@ Thumbs.db
 # ── Misc ──────────────────────────────────────
 *.tsbuildinfo
 .turbo/
+
+# ── Artefactos compilados JS junto a fuentes TS ──
+frontend/src/**/*.js
