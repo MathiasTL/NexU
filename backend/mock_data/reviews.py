@@ -1,0 +1,58 @@
+from app.models.review import Review
+
+REVIEWS: list[Review] = [
+    Review(
+        id=1,
+        property_id=1,
+        booking_id=1,
+        reviewer_id=1,
+        rating=5,
+        comment="Excelente habitación, muy cerca de la PUCP. El propietario fue muy atento y el espacio es exactamente como en las fotos. Muy recomendado para estudiantes.",
+        created_at="2026-01-15",
+    ),
+    Review(
+        id=2,
+        property_id=1,
+        booking_id=2,
+        reviewer_id=3,
+        rating=4,
+        comment="Buena ubicación y precio justo para San Miguel. El WiFi es rápido y el ambiente tranquilo para estudiar. Le falta un poco de mantenimiento en el baño.",
+        created_at="2026-02-20",
+    ),
+    Review(
+        id=3,
+        property_id=2,
+        booking_id=3,
+        reviewer_id=1,
+        rating=5,
+        comment="El estudio es perfecto para vivir solo. Totalmente independiente y con todos los servicios incluidos. La distancia a la UNI es exacta. 100% recomendado.",
+        created_at="2026-03-05",
+    ),
+    Review(
+        id=4,
+        property_id=4,
+        booking_id=4,
+        reviewer_id=3,
+        rating=4,
+        comment="Departamento moderno y bien ubicado en La Molina. El edificio tiene buena seguridad. El precio es alto pero vale para la calidad y ubicación cerca de ULIMA.",
+        created_at="2026-04-10",
+    ),
+    Review(
+        id=5,
+        property_id=5,
+        booking_id=1,
+        reviewer_id=1,
+        rating=5,
+        comment="Miraflores es ideal. La habitación es amplia, el vecino muy respetuoso y la UP está a un paseo. El internet de fibra es rapidísimo.",
+        created_at="2026-05-01",
+    ),
+    Review(
+        id=6,
+        property_id=7,
+        booking_id=2,
+        reviewer_id=3,
+        rating=4,
+        comment="Buen estudio en Jesús María. Independiente con entrada propia, lo que valoro mucho. La UNFV está cerca. El edificio tiene vigilancia que te da tranquilidad.",
+        created_at="2026-05-20",
+    ),
+]
