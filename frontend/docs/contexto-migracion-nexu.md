@@ -1,3 +1,11 @@
+# [ARCHIVO HISTÓRICO — OBSOLETO]
+
+> **Este documento está archivado.** Fue reemplazado por `contexto-migracion-nexu-v2.md`
+> el 2026-06-25, que es la **fuente de verdad actual** de la migración.
+> No editar este archivo. Conservado solo como referencia histórica del estado inicial.
+
+---
+
 # Contexto de Migración — Proyecto NexU (antes "Smart")
 
 > **Nota de nomenclatura**: el proyecto fue renombrado de "Smart" a

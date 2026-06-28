@@ -1,46 +1,47 @@
-import { USERS_MOCK } from '@/mock/users.mock'
-import { NOTIFICATIONS_MOCK } from '@/mock/notifications.mock'
-import { MESSAGES_MOCK } from '@/mock/messages.mock'
-import type { ProfileUpdatePayload } from '../types/account.types'
-
-const delay = (ms = 400) => new Promise(res => setTimeout(res, ms))
+import { apiRequest } from '@/core/http/client'
+import type { AuthUser } from '@/features/auth/types/auth.types'
+import type { ProfileUpdatePayload, PersonalInfoPayload, LifestylePreferences } from '../types/account.types'
+import type { Notification } from '@/mock/notifications.mock'
+import type { Conversation, Message } from '@/mock/messages.mock'
 
 export const accountService = {
-  updateProfile: async (userId: number, data: ProfileUpdatePayload) => {
-    await delay()
-    const user = USERS_MOCK.find(u => u.id === userId)
-    if (user) Object.assign(user, data)
-    return user
+  updateProfile: async (userId: number, data: ProfileUpdatePayload): Promise<AuthUser> => {
+    return apiRequest<AuthUser>(`/users/${userId}/profile`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
   },
 
-  getNotifications: async (userId: number) => {
-    await delay()
-    return NOTIFICATIONS_MOCK.filter(n => n.userId === userId)
+  updatePersonalInfo: async (userId: number, data: PersonalInfoPayload): Promise<AuthUser> => {
+    return apiRequest<AuthUser>(`/users/${userId}/personal-info`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
   },
 
-  markNotificationRead: async (id: number) => {
-    await delay()
-    const notif = NOTIFICATIONS_MOCK.find(n => n.id === id)
-    if (notif) notif.read = true
+  updatePreferences: async (userId: number, prefs: LifestylePreferences): Promise<AuthUser> => {
+    return apiRequest<AuthUser>(`/users/${userId}/preferences`, {
+      method: 'PATCH',
+      body: JSON.stringify({ lifestylePreferences: prefs }),
+    })
   },
 
-  getConversations: async (userId: number) => {
-    await delay()
-    return MESSAGES_MOCK.filter(c => c.participants.includes(userId))
+  getNotifications: async (userId: number): Promise<Notification[]> => {
+    return apiRequest<Notification[]>(`/users/${userId}/notifications`)
   },
 
-  sendMessage: async (conversationId: number, senderId: number, text: string) => {
-    await delay()
-    const conv = MESSAGES_MOCK.find(c => c.id === conversationId)
-    if (!conv) return
-    const newMsg = {
-      id: conv.messages.length + 1,
-      senderId,
-      text,
-      createdAt: new Date().toISOString(),
-    }
-    conv.messages.push(newMsg)
-    conv.lastMessageAt = newMsg.createdAt
-    return newMsg
+  markNotificationRead: async (id: number): Promise<void> => {
+    return apiRequest<void>(`/notifications/${id}/read`, { method: 'PATCH' })
+  },
+
+  getConversations: async (userId: number): Promise<Conversation[]> => {
+    return apiRequest<Conversation[]>(`/users/${userId}/conversations`)
+  },
+
+  sendMessage: async (conversationId: number, senderId: number, text: string): Promise<Message> => {
+    return apiRequest<Message>(`/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ senderId, text }),
+    })
   },
 }

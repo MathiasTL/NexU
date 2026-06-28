@@ -1,17 +1,14 @@
-import { REVIEWS_MOCK } from '@/mock/reviews.mock'
+import { apiRequest } from '@/core/http/client'
 import type { Review } from '../types/review.types'
-
-const delay = (ms = 400) => new Promise(res => setTimeout(res, ms))
 
 export const reviewService = {
   getByPropertyId: async (propertyId: number): Promise<Review[]> => {
-    await delay()
-    return REVIEWS_MOCK.filter(r => r.propertyId === propertyId)
+    return apiRequest<Review[]>(`/properties/${propertyId}/reviews`)
   },
 
   getByHostId: async (_hostId: number, propertyIds: number[]): Promise<Review[]> => {
-    await delay()
-    return REVIEWS_MOCK.filter(r => propertyIds.includes(r.propertyId))
+    if (!propertyIds.length) return []
+    return apiRequest<Review[]>(`/reviews?propertyIds=${propertyIds.join(',')}`)
   },
 
   getAverageRating: (reviews: Review[]): number => {

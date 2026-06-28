@@ -8,5 +8,13 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') },
     extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
   },
-  server: { port: 5173 },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
+  },
 })
