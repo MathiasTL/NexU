@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { Calendar, Users } from 'lucide-react'
 import { BookingStatusBadge } from './BookingStatusBadge'
 import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
-import { PROPERTIES_MOCK } from '@/mock/properties.mock'
 import type { Booking } from '../types/booking.types'
 
 interface BookingCardProps {
@@ -11,18 +10,16 @@ interface BookingCardProps {
 }
 
 export const BookingCard = ({ booking, onSelect }: BookingCardProps) => {
-  const property = PROPERTIES_MOCK.find(p => p.id === booking.propertyId)
-
   return (
     <div
       className="cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
       onClick={() => onSelect?.(booking)}
     >
       <div className="flex gap-4 p-4">
-        {property && (
+        {booking.propertyImage && (
           <img
-            src={property.images[0]}
-            alt={property.title}
+            src={booking.propertyImage}
+            alt={booking.propertyTitle ?? ''}
             className="h-20 w-24 shrink-0 rounded-xl object-cover"
           />
         )}
@@ -33,7 +30,7 @@ export const BookingCard = ({ booking, onSelect }: BookingCardProps) => {
               onClick={e => e.stopPropagation()}
               className="line-clamp-1 font-semibold text-gray-900 hover:text-primary dark:text-white dark:hover:text-primary"
             >
-              {property?.title ?? `Propiedad #${booking.propertyId}`}
+              {booking.propertyTitle ?? `Propiedad #${booking.propertyId}`}
             </Link>
             <BookingStatusBadge status={booking.status} />
           </div>

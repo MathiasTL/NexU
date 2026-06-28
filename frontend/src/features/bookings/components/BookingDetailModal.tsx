@@ -2,7 +2,6 @@ import { Calendar, Users, MessageSquare } from 'lucide-react'
 import { Modal } from '@/shared/components/ui/Modal'
 import { BookingStatusBadge } from './BookingStatusBadge'
 import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
-import { PROPERTIES_MOCK } from '@/mock/properties.mock'
 import type { Booking } from '../types/booking.types'
 
 interface BookingDetailModalProps {
@@ -13,17 +12,17 @@ interface BookingDetailModalProps {
 
 export const BookingDetailModal = ({ booking, open, onClose }: BookingDetailModalProps) => {
   if (!booking) return null
-  const property = PROPERTIES_MOCK.find(p => p.id === booking.propertyId)
 
   return (
     <Modal open={open} onClose={onClose} title="Detalle de reserva" size="md">
       <div className="flex flex-col gap-4">
-        {property && (
+        {(booking.propertyImage || booking.propertyTitle) && (
           <div className="flex gap-3">
-            <img src={property.images[0]} alt={property.title} className="h-16 w-20 rounded-xl object-cover" />
+            {booking.propertyImage && (
+              <img src={booking.propertyImage} alt={booking.propertyTitle ?? ''} className="h-16 w-20 rounded-xl object-cover" />
+            )}
             <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{property.title}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{property.district}, {property.city}</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{booking.propertyTitle ?? `Propiedad #${booking.propertyId}`}</p>
             </div>
           </div>
         )}

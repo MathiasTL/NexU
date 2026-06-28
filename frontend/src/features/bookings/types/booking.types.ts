@@ -3,6 +3,8 @@ export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 export interface Booking {
   id: number
   propertyId: number
+  propertyTitle: string | null
+  propertyImage: string | null
   tenantId: number
   hostId: number
   startMonth: string         // 'YYYY-MM'
