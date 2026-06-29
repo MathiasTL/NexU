@@ -281,7 +281,12 @@ Devuelve reservas. Requiere `tenantId` o `hostId` como query param.
   {
     "id": 1,
     "propertyId": 1,
+    "propertyTitle": "Habitación individual cerca de PUCP",
+    "propertyImage": "https://images.unsplash.com/...",
     "tenantId": 1,
+    "tenantFirstName": "Ana",
+    "tenantLastName": "García",
+    "tenantEmail": "ana.garcia@pucp.pe",
     "hostId": 2,
     "startMonth": "2026-03",
     "durationMonths": 6,
@@ -297,6 +302,8 @@ Devuelve reservas. Requiere `tenantId` o `hostId` como query param.
   }
 ]
 ```
+
+Los campos `propertyTitle`, `propertyImage`, `tenantFirstName`, `tenantLastName` y `tenantEmail` son enriquecidos en el servicio mediante JOIN con `properties` y `users`. Devuelven `null` si el recurso relacionado no existe.
 
 **Errores:**
 - `400 Bad Request` — ni `tenantId` ni `hostId` provistos.
@@ -437,9 +444,39 @@ Estadísticas del panel de propietario.
 
 **Response 200:** `Booking[]` (máx 4, ordenadas por `createdAt` desc)
 
+Los campos enriquecidos (`propertyTitle`, `propertyImage`, `tenantFirstName`, `tenantLastName`, `tenantEmail`) están siempre presentes, igual que en `GET /bookings`.
+
 ---
 
 ## Users
+
+### GET /users/{id}
+
+Devuelve el perfil público de un usuario. Usado principalmente para mostrar la información del host en la página de detalle de una propiedad.
+
+**Auth requerida:** No
+
+**Response 200:** `AuthUser`
+
+```json
+{
+  "id": 2,
+  "email": "carlos.mendoza@gmail.com",
+  "firstName": "Carlos",
+  "lastName": "Mendoza",
+  "role": "host",
+  "avatarUrl": "https://i.pravatar.cc/150?img=52",
+  "phone": "+51 998 765 432",
+  "bio": "Propietario con más de 5 años alquilando habitaciones...",
+  "createdAt": "2024-08-20",
+  "lifestylePreferences": null
+}
+```
+
+**Errores:**
+- `404 Not Found` — usuario no encontrado.
+
+---
 
 ### PATCH /users/{id}/profile
 
@@ -549,6 +586,25 @@ Conversaciones del usuario con sus mensajes.
 **Auth requerida:** Sí
 
 **Response 200:** `Conversation[]`
+
+```json
+[
+  {
+    "id": 1,
+    "propertyId": 1,
+    "propertyTitle": "Habitación individual cerca de PUCP",
+    "participants": [1, 2],
+    "participantsInfo": [
+      { "id": 1, "firstName": "Ana", "lastName": "García", "avatarUrl": "https://..." },
+      { "id": 2, "firstName": "Carlos", "lastName": "Mendoza", "avatarUrl": "https://..." }
+    ],
+    "messages": [...],
+    "lastMessageAt": "2026-06-20T14:30:00"
+  }
+]
+```
+
+`participantsInfo` incluye nombre y avatar de cada participante, para que el frontend pueda mostrar el nombre del interlocutor sin un request adicional a `GET /users/{id}`.
 
 ---
 
