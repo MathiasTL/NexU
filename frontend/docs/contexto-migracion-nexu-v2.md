@@ -112,11 +112,18 @@ fueron migradas a `primary-*` / `secondary-*`.
 - Key de localStorage: `'nextu_favorites_v1'`.
 - Expone `toggle(id)`, `isFavorite(id)`, `ids[]`.
 
-#### Patrón de servicios — confirmado y extendido
+#### Patrón de servicios — integrado con backend real
 
-Todos los `*.service.ts` siguen el patrón con `delay()` como única capa que toca `src/mock/`.
-Servicios existentes: `auth.service`, `property.service`, `booking.service`, `account.service`,
-`host.service`, `review.service`. Ningún componente o hook importa mocks directamente.
+Todos los `*.service.ts` usan `apiRequest` del cliente HTTP real (`src/core/http/client.ts`).
+El patrón `delay()` + mock fue reemplazado en el Paso 4 (PR #10). Servicios existentes:
+`auth.service`, `property.service`, `booking.service`, `account.service`, `host.service`,
+`review.service`. Ningún componente o hook importa mocks directamente.
+
+> **Pendiente menor:** `account.service.ts` importa los tipos `Notification`, `Conversation`
+> y `Message` desde `src/mock/notifications.mock` y `src/mock/messages.mock` porque esos tipos
+> no fueron movidos a archivos `types/` propios. Los archivos mock siguen presentes en
+> `src/mock/` aunque los servicios ya no los usan para datos. Tarea: mover tipos a
+> `account/types/account.types.ts` y eliminar `src/mock/` completo.
 
 #### Rutas registradas (router/index.tsx)
 
@@ -166,47 +173,81 @@ Servicios existentes: `auth.service`, `property.service`, `booking.service`, `ac
 | Host — mis propiedades | ✅ Completo |
 | Host — reservaciones con panel de detalle y cambio de estado | ✅ Completo |
 | Host — reseñas recibidas | ✅ Completo |
-| Wizard nueva propiedad (9 pasos) | ⚠️ Parcial — ver nota wizard |
+| Wizard nueva propiedad (9 pasos) | ✅ Completo |
 | Account — perfil y datos personales editables | ✅ Completo |
 | Account — notificaciones con marcar como leída | ✅ Completo |
 | Account — mensajería (lista + envío) | ✅ Completo |
 | Modo oscuro | ✅ Implementado — toggle Sol/Luna en navbar; preferencia persistida en `nextu_ui_v1` |
-| Persistencia de filtros de búsqueda entre sesiones | ❌ No implementado |
+| Persistencia de filtros de búsqueda entre sesiones | ✅ Implementado — key `nextu_search_filters_v1` |
 | Push notifications | ❌ No implementado (ni planeado para frontend) |
 
-**Nota wizard:** El wizard de 9 pasos funciona y publica propiedades. El Step5 (fotos)
-es un placeholder — acepta URLs de imagen en texto pero no sube archivos reales.
-`CreatePropertyDraft` no incluye `pricePerMonth`, `nearestUniversity`,
-`distanceToUniversityMinutes` ni `availabilityStatus` — la propiedad creada recibe
-defaults del `property.service.create()`.
+**Nota wizard:** El wizard de 9 pasos está completo. Step5 fue reescrito con `<input type="file">`,
+drag & drop y previsualización local (`URL.createObjectURL`). `CreatePropertyDraft` incluye
+`roomType`, `pricePerMonth`, `nearestUniversity`, `distanceToUniversityMinutes` y `availabilityStatus`.
+**Pendiente:** el `handleSubmit` del wizard no llama a `POST /properties/upload-images` — sube la
+propiedad sin fotos reales (las miniaturas son objetos locales que no persisten).
 
 ---
 
 ### Paso 3 — Backend (FastAPI)
 
-**Estado:** ⏳ No iniciado.
+**Estado:** ✅ Completo (PR #9 — test suite, PR #11 — fix booking enriquecido).
 
-`backend/` contiene únicamente `.gitkeep`. No hay código de backend de ningún tipo.
+Stack real: Python 3.12+, FastAPI 0.111+, Pydantic v2, python-jose, passlib/bcrypt,
+httpx, pytest.
 
-Diseño previsto: Python 3.12+, FastAPI, arquitectura `routers → controllers →
-services → repositories`, con interfaz abstracta de repositorio para facilitar
-la migración posterior a PostgreSQL. Ver sección 5 para los endpoints propuestos.
+Arquitectura implementada: `routers → services → repositories (Protocol)` con
+implementaciones en memoria (`memory/`). Placeholder `postgres/` conservado para
+migración futura.
+
+```
+backend/
+├── app/
+│   ├── main.py            ← lifespan inicializa todos los repos en app.state
+│   ├── config.py
+│   ├── core/              ← security.py (JWT) + exceptions.py
+│   ├── models/            ← entidades de dominio (frozen Pydantic, snake_case)
+│   ├── schemas/           ← DTOs HTTP (alias_generator=to_camel)
+│   ├── repositories/
+│   │   ├── base.py        ← Protocol interfaces
+│   │   ├── memory/        ← implementaciones actuales
+│   │   └── postgres/      ← .gitkeep (placeholder)
+│   ├── services/          ← lógica de negocio stateless
+│   └── api/v1/            ← routers: auth, properties, bookings, reviews, users, host, amenities
+├── mock_data/             ← seed data (3 usuarios, 8 propiedades, 4 bookings, 6 reviews…)
+├── tests/                 ← 9 módulos de test (131 passed al cierre del Paso 3)
+├── requirements.txt
+├── requirements-dev.txt
+└── .env.example
+```
+
+Ver `backend/docs/arquitectura.md` para documentación completa de la arquitectura.
+Ver `backend/docs/endpoints.md` para referencia de todos los endpoints.
+Ver `backend/docs/tests.md` para cobertura de tests.
 
 ---
 
 ### Paso 4 — Integración frontend ↔ backend
 
-**Estado:** ⏳ No iniciado — depende del Paso 3.
+**Estado:** ✅ Completo (PR #10 — feature/integracion-frontend-backend).
 
-Alcance: reemplazar cada `*.service.ts` del frontend por llamadas HTTP al backend.
-Los componentes y páginas **no deben requerir cambios** gracias al patrón de servicios.
+Todos los `*.service.ts` fueron migrados de mock+delay a `apiRequest` del cliente HTTP
+real (`src/core/http/client.ts`). Los componentes, páginas y hooks no requirieron cambios.
 
-Tareas pendientes de este paso:
-- Agregar cliente HTTP (fetch nativo o axios).
-- Reemplazar `delay()` + arrays mock por `fetch('/api/...')` en cada `*.service.ts`.
-- Gestión de tokens JWT (backend → localStorage o cookie httpOnly).
-- Manejo de errores HTTP en los servicios.
-- Eliminar `src/mock/` una vez conectados todos los servicios.
+**Completado:**
+- Cliente HTTP con refresh automático de token (`src/core/http/client.ts`).
+- `auth.service.ts` → `POST /auth/login`, `POST /auth/register`, logout.
+- `property.service.ts` → `GET /properties`, `GET /properties/{id}`, `GET /properties/search`, `POST /properties`.
+- `booking.service.ts` → `GET /bookings`, `POST /bookings`, `PATCH /bookings/{id}/status`.
+- `review.service.ts` → `GET /properties/{id}/reviews`, `GET /reviews`.
+- `account.service.ts` → PATCH profile/personal-info/preferences, GET notifications/conversations, POST messages.
+- `host.service.ts` → GET stats/activity/properties.
+- `AuthContext.tsx` restaura sesión desde cache localStorage (`nextu_user`) si existe token válido.
+
+**Pendientes menores:**
+- `src/mock/` aún existe (tipos de Notification/Conversation/Message importados en account.service).
+- Wizard no llama a `POST /properties/upload-images` al crear propiedad (fotos locales no persisten).
+- `AuthContext` no llama `GET /auth/me` para validar token al iniciar app — usa cache localStorage sin verificar.
 
 ---
 
@@ -1064,4 +1105,5 @@ Marcar como ✅ cuando esté implementado y verificado con `npx tsc --noEmit`:
 | 7.0 | 2026-06-25 | Refactor completo de campus universitarios en mapa. Nuevo `src/shared/data/universityCampuses.ts` con GeoJSON FeatureCollection tipada para 10 universidades (PUCP, UNMSM, UNI, UPC, ULIMA, UP, USIL, UNFV, UNAC, UPCH). Arquitectura escalable: agregar universidad = 1 entrada en el array, sin tocar lógica. Polígonos distinguen 'official'/'approximate' visualmente. Ícono de label corregido con iconSize:[0,0]+CSS transform para autocentrado independiente del largo del texto. Sigue ⚠️ Parcial por coordenadas aproximadas. |
 | 8.0 | 2026-06-25 | Prioridad media completada. M1: persistencia de filtros de búsqueda en localStorage (key `nextu_search_filters_v1`) en `SearchPage.tsx`. M2: mocks de mensajes y notificaciones reescritos en contexto universitario (ciclos académicos, convivencia, alquiler mensual). M3: `Step5Photos.tsx` reescrito con `<input type="file">`, drag & drop, previsualización local con `URL.createObjectURL` y grilla de miniaturas con botón de eliminación; `CreatePropertyDraft` extendido con `images?`. Paso 2 del frontend **completo**. |
 | 10.0 | 2026-06-25 | B1 — Modo oscuro implementado. `tailwind.config.ts`: `darkMode: 'class'`. `ui.store.ts`: `darkMode` + `toggleDarkMode` con Zustand persist (key `nextu_ui_v1`); sincroniza clase `dark` en `document.documentElement` al toggle y al rehidratar. Toggle Sol/Luna en `Navbar` y `HostNavbar`. Variantes `dark:` aplicadas a: todos los layouts (Main/Host/Account), sidebars, `MobileBottomNav`, `Button`, `Input`, `Modal`, `LoadingSkeleton`, `PropertyCard`, `PropertyBookingCard`, `BookingCard`, `BookingDetailModal`, `CheckoutModal`, `SuccessModal`, `ReservationDetailPanel`, `SearchPage`, `HostReservationsPage`. `npx tsc --noEmit` sin errores. |
+| 11.0 | 2026-06-28 | Auditoría de actualización. Paso 3 ✅ (backend FastAPI completo — estructura real documentada). Paso 4 ✅ (todos los services migrados a apiRequest — PR #10). Flujos corregidos: Wizard ✅, Persistencia filtros ✅. Patrón de servicios actualizado a realidad post-integración. Pendientes documentados: src/mock/ por limpiar, wizard sin upload real, AuthContext sin validación /auth/me al iniciar. |
 | 9.0 | 2026-06-25 | Semiótica completada (S1–S4). S1: razones de compatibilidad visibles — tooltip nativo en badge de `PropertyCard` + texto debajo; `RecommendationsPage` extrae y muestra `reasons[]`. S2: flujo de booking migrado a mensual — `BookingDraft/Booking/CreateBookingPayload` con `startMonth/durationMonths/residentCount/pricePerMonth`; `PropertyBookingCard`, `CheckoutModal`, `SuccessModal`, `PropertyDetailPage`, `BookingCard`, `BookingDetailModal`, `ReservationDetailPanel`, `ActivityFeed` actualizados; `formatters.ts` con `formatMonths` y `formatYearMonth`; mock de bookings migrado. S3: capa de transporte en mapa — `limaTransport.ts` con 10 paradas (Metropolitano/Tren/Corredor); toggle en `PropertySearchMap` con marcadores diferenciados y leyenda dinámica. S4: touch targets — `Button` `md` a `py-2.5`; chips de `SearchPage` a `py-2`. `npx tsc --noEmit` sin errores. |

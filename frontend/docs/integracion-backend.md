@@ -1,10 +1,14 @@
 # NexU Frontend — Guía de Integración con el Backend
 
-*(Creado: 2026-06-28 — Aplica al Paso 4 de la migración)*
+*(Creado: 2026-06-28 — Paso 4 **completado** el 2026-06-28 vía PR #10)*
 
-> Este documento describe exactamente qué cambios debe hacer el frontend para conectarse al
-> backend FastAPI. El objetivo es que **ningún componente, página ni hook necesite modificarse**:
-> solo los `*.service.ts` y el nuevo cliente HTTP.
+> **Estado actual (2026-06-28):** La integración está completa. Todos los `*.service.ts`
+> ya usan `apiRequest` del cliente HTTP real. Este documento se conserva como referencia
+> de las decisiones de diseño tomadas. Ver pendientes al final de la sección 7.
+>
+> Este documento describió qué cambios debía hacer el frontend para conectarse al
+> backend FastAPI. El objetivo era que **ningún componente, página ni hook necesitara modificarse**:
+> solo los `*.service.ts` y el nuevo cliente HTTP. ✅ Logrado.
 
 ---
 
@@ -376,13 +380,19 @@ Integrar un servicio a la vez para validar que no hay regresiones:
 
 ## 7. Eliminar `src/mock/`
 
-**Cuándo:** Una vez que todos los servicios estén conectados y probados contra el backend.
+**Estado (2026-06-28): ⏳ Pendiente.**
 
-**Orden:**
-1. Verificar que ningún archivo fuera de `*.service.ts` importa desde `src/mock/` (ya debería ser así por el patrón de servicios).
-2. Eliminar `src/mock/` completo.
-3. Ejecutar `npx tsc --noEmit` — no debe haber errores.
-4. Si hay errores de imports, el componente que los tiene viola el patrón de servicios y debe corregirse.
+Los servicios ya no consumen datos de mock, pero `account.service.ts` importa tipos
+desde `src/mock/notifications.mock` y `src/mock/messages.mock` porque `Notification`,
+`Conversation` y `Message` no tienen archivos `types/` propios en `features/account/`.
+
+**Para completar:**
+1. Mover `Notification` a `features/account/types/account.types.ts`.
+2. Mover `Message` y `Conversation` a `features/account/types/account.types.ts` (o a `features/messages/types/`).
+3. Actualizar el import en `account.service.ts`.
+4. Verificar que ningún otro archivo importe desde `src/mock/`.
+5. Eliminar `src/mock/` completo.
+6. Ejecutar `npx tsc --noEmit` — no debe haber errores.
 
 ---
 
