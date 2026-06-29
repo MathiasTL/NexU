@@ -35,4 +35,8 @@ export const authService = {
   logout: (): void => {
     clearTokens()
   },
+
+  me: async (): Promise<AuthUser> => {
+    return apiRequest<AuthUser>('/auth/me')
+  },
 }

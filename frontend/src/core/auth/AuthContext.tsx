@@ -21,24 +21,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Hidratación: si hay token y usuario en caché, restaurar sesión
+  // Hidratación: si hay token, validarlo contra /auth/me y restaurar sesión
   useEffect(() => {
     const token = getAccessToken()
-    if (token) {
-      const cached = localStorage.getItem(USER_CACHE_KEY)
-      if (cached) {
-        try {
-          setUser(JSON.parse(cached) as AuthUser)
-        } catch {
-          localStorage.removeItem(USER_CACHE_KEY)
-          clearTokens()
-        }
-      } else {
-        // Token existe pero no hay caché de usuario — limpiar estado inconsistente
-        clearTokens()
-      }
+    if (!token) {
+      setIsLoading(false)
+      return
     }
-    setIsLoading(false)
+    authService.me()
+      .then(authUser => {
+        setUser(authUser)
+        localStorage.setItem(USER_CACHE_KEY, JSON.stringify(authUser))
+      })
+      .catch(() => {
+        clearTokens()
+        localStorage.removeItem(USER_CACHE_KEY)
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
