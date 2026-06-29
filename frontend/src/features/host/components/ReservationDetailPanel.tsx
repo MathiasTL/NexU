@@ -2,8 +2,6 @@ import { X, Calendar, Users, MessageSquare } from 'lucide-react'
 import { BookingStatusBadge } from '@/features/bookings/components/BookingStatusBadge'
 import { Button } from '@/shared/components/ui/Button'
 import { formatCurrency, formatMonths, formatYearMonth } from '@/shared/utils/formatters'
-import { PROPERTIES_MOCK } from '@/mock/properties.mock'
-import { USERS_MOCK } from '@/mock/users.mock'
 import type { Booking } from '@/features/bookings/types/booking.types'
 
 interface ReservationDetailPanelProps {
@@ -15,8 +13,9 @@ interface ReservationDetailPanelProps {
 export const ReservationDetailPanel = ({ booking, onClose, onUpdateStatus }: ReservationDetailPanelProps) => {
   if (!booking) return null
 
-  const property = PROPERTIES_MOCK.find(p => p.id === booking.propertyId)
-  const tenant   = USERS_MOCK.find(u => u.id === booking.tenantId)
+  const tenantName = booking.tenantFirstName
+    ? `${booking.tenantFirstName} ${booking.tenantLastName ?? ''}`.trim()
+    : null
 
   return (
     <div className="h-full overflow-y-auto">
@@ -27,12 +26,13 @@ export const ReservationDetailPanel = ({ booking, onClose, onUpdateStatus }: Res
         </button>
       </div>
 
-      {property && (
+      {(booking.propertyTitle || booking.propertyImage) && (
         <div className="mb-4 flex gap-3">
-          <img src={property.images[0]} alt={property.title} className="h-16 w-20 rounded-xl object-cover" />
+          {booking.propertyImage && (
+            <img src={booking.propertyImage} alt={booking.propertyTitle ?? ''} className="h-16 w-20 rounded-xl object-cover" />
+          )}
           <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">{property.title}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{property.district}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white">{booking.propertyTitle}</p>
           </div>
         </div>
       )}
@@ -65,11 +65,13 @@ export const ReservationDetailPanel = ({ booking, onClose, onUpdateStatus }: Res
         </div>
       </div>
 
-      {tenant && (
+      {tenantName && (
         <div className="mb-4">
           <p className="mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Estudiante</p>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.firstName} {tenant.lastName}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{tenant.email}</p>
+          <p className="text-sm font-medium text-gray-900 dark:text-white">{tenantName}</p>
+          {booking.tenantEmail && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">{booking.tenantEmail}</p>
+          )}
         </div>
       )}
 

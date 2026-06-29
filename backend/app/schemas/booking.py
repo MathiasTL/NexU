@@ -8,6 +8,9 @@ class BookingResponse(BaseSchema):
     property_title: str | None
     property_image: str | None
     tenant_id: int
+    tenant_first_name: str | None
+    tenant_last_name: str | None
+    tenant_email: str | None
     host_id: int
     start_month: str
     duration_months: int

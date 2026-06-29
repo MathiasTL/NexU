@@ -2,8 +2,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Query
 from app.schemas.booking import BookingResponse, CreateBookingRequest, UpdateBookingStatusRequest
 from app.services.booking import BookingService
-from app.api.deps import get_booking_repo, get_property_repo, get_current_user_id
-from app.repositories.base import BookingRepository, PropertyRepository
+from app.api.deps import get_booking_repo, get_property_repo, get_user_repo, get_current_user_id
+from app.repositories.base import BookingRepository, PropertyRepository, UserRepository
 from app.core.exceptions import bad_request
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
@@ -12,8 +12,9 @@ router = APIRouter(prefix="/bookings", tags=["bookings"])
 def _get_service(
     repo: BookingRepository = Depends(get_booking_repo),
     prop_repo: PropertyRepository = Depends(get_property_repo),
+    user_repo: UserRepository = Depends(get_user_repo),
 ) -> BookingService:
-    return BookingService(repo, prop_repo)
+    return BookingService(repo, prop_repo, user_repo)
 
 
 @router.get("", response_model=list[BookingResponse])

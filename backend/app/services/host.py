@@ -1,5 +1,5 @@
 from __future__ import annotations
-from app.repositories.base import BookingRepository, ReviewRepository, PropertyRepository
+from app.repositories.base import BookingRepository, ReviewRepository, PropertyRepository, UserRepository
 from app.schemas.review import DashboardStatsResponse
 from app.schemas.booking import BookingResponse
 from app.services.booking import _to_response
@@ -11,10 +11,12 @@ class HostService:
         booking_repo: BookingRepository,
         review_repo: ReviewRepository,
         property_repo: PropertyRepository,
+        user_repo: UserRepository | None = None,
     ) -> None:
         self._bookings = booking_repo
         self._reviews = review_repo
         self._props = property_repo
+        self._users = user_repo
 
     def get_stats(self, host_id: int) -> DashboardStatsResponse:
         bookings = self._bookings.get_by_host_id(host_id)
@@ -39,4 +41,4 @@ class HostService:
     def get_recent_activity(self, host_id: int, limit: int = 4) -> list[BookingResponse]:
         bookings = self._bookings.get_by_host_id(host_id)
         sorted_bookings = sorted(bookings, key=lambda b: b.created_at, reverse=True)
-        return [_to_response(b) for b in sorted_bookings[:limit]]
+        return [_to_response(b, self._props, self._users) for b in sorted_bookings[:limit]]

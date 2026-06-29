@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, Query
 from app.schemas.review import DashboardStatsResponse
 from app.schemas.booking import BookingResponse
 from app.services.host import HostService
-from app.api.deps import get_booking_repo, get_review_repo, get_property_repo, get_current_user_id
-from app.repositories.base import BookingRepository, ReviewRepository, PropertyRepository
+from app.api.deps import get_booking_repo, get_review_repo, get_property_repo, get_user_repo, get_current_user_id
+from app.repositories.base import BookingRepository, ReviewRepository, PropertyRepository, UserRepository
 
 router = APIRouter(prefix="/host", tags=["host"])
 
@@ -13,8 +13,9 @@ def _get_service(
     booking_repo: BookingRepository = Depends(get_booking_repo),
     review_repo: ReviewRepository = Depends(get_review_repo),
     property_repo: PropertyRepository = Depends(get_property_repo),
+    user_repo: UserRepository = Depends(get_user_repo),
 ) -> HostService:
-    return HostService(booking_repo, review_repo, property_repo)
+    return HostService(booking_repo, review_repo, property_repo, user_repo)
 
 
 @router.get("/stats", response_model=DashboardStatsResponse)
