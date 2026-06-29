@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import * as Icons from 'lucide-react'
-import { AMENITY_CATEGORIES } from '@/mock/amenities.mock'
+import { amenityService } from '../services/amenity.service'
+import type { AmenityCategory } from '@/mock/amenities.mock'
 import type { Property } from '../types/property.types'
 
 interface PropertyAmenitiesProps {
@@ -15,7 +17,13 @@ const DynamicIcon = ({ name }: { name: string }) => {
 }
 
 export const PropertyAmenities = ({ amenities }: PropertyAmenitiesProps) => {
-  const activeAmenities = AMENITY_CATEGORIES
+  const [categories, setCategories] = useState<AmenityCategory[]>([])
+
+  useEffect(() => {
+    amenityService.getCategories().then(setCategories).catch(() => setCategories([]))
+  }, [])
+
+  const activeAmenities = categories
     .flatMap(cat => cat.amenities.map(a => ({ ...a, category: cat.title })))
     .filter(a => amenities.includes(a.id))
 

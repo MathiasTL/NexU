@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react'
 import { StepHeader } from '@/shared/components/ui/StepHeader'
 import { WizardNav } from './WizardNav'
-import { AMENITY_CATEGORIES } from '@/mock/amenities.mock'
+import { amenityService } from '@/features/properties/services/amenity.service'
 import { cn } from '@/shared/utils/cn'
+import type { AmenityCategory } from '@/mock/amenities.mock'
 import type { CreatePropertyDraft } from '../types/host.types'
 
 interface StepProps {
@@ -12,6 +14,12 @@ interface StepProps {
 }
 
 export const Step4Amenities = ({ draft, update, onNext, onPrev }: StepProps) => {
+  const [categories, setCategories] = useState<AmenityCategory[]>([])
+
+  useEffect(() => {
+    amenityService.getCategories().then(setCategories).catch(() => setCategories([]))
+  }, [])
+
   const toggle = (id: string) => {
     const current = draft.amenities
     update({
@@ -23,7 +31,7 @@ export const Step4Amenities = ({ draft, update, onNext, onPrev }: StepProps) => 
     <div>
       <StepHeader current={4} total={9} title="¿Qué servicios ofreces?" subtitle="Selecciona todos los que apliquen a tu propiedad." />
       <div className="flex flex-col gap-6">
-        {AMENITY_CATEGORIES.map(cat => (
+        {categories.map(cat => (
           <div key={cat.title}>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{cat.title}</h3>
             <div className="grid grid-cols-2 gap-2">
