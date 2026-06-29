@@ -245,3 +245,83 @@ Razones:
 - B permite inyectar repositorios distintos en tests usando `app.state.user_repo = MockUserRepo()` antes de cada test.
 - B es el patrón recomendado por FastAPI para recursos de aplicación (DB connections, etc.).
 - Es explícito: en `main.py` se ve exactamente qué se inicializa.
+
+---
+
+## D11 — BookingResponse: enriquecimiento con datos de propiedad y tenant
+
+**Problema:**  
+El frontend necesita mostrar el título e imagen de la propiedad y el nombre del inquilino directamente en cada reserva (ActivityFeed, ReservationDetailPanel, lista de reservas del tenant). Si el frontend tuviera que hacer un request adicional por cada booking, generaría N+1 llamadas.
+
+**Opciones:**
+- A) Devolver solo IDs (`propertyId`, `tenantId`) y dejar que el frontend haga los lookups.
+- B) Embedar los datos directamente en `BookingResponse` como campos opcionales (`propertyTitle`, `propertyImage`, `tenantFirstName`, `tenantLastName`, `tenantEmail`).
+
+**Decisión elegida: B (enriquecimiento en el servicio)**
+
+Razones:
+- Elimina N+1 en el frontend: una sola llamada devuelve todo lo necesario para renderizar la UI.
+- El patrón ya existe en el proyecto (ReviewService hace lo mismo con reviewer_name).
+- Los campos son opcionales (`| None`): si el repo no puede resolver el JOIN, devuelven `null` sin romper el contrato.
+
+**Implementación:**
+`BookingService._to_response(b, prop_repo, user_repo)` acepta los repositorios como parámetros opcionales y hace los lookups. `HostService.get_recent_activity` también pasa sus repos para enriquecer la actividad reciente.
+
+**Implicación para PostgreSQL:**  
+En la migración, estos campos se calculan con `LEFT JOIN properties ON bookings.property_id = properties.id` y `LEFT JOIN users ON bookings.tenant_id = users.id`. No se almacenan en la tabla `bookings`.
+
+---
+
+## D12 — GET /users/{id}: endpoint público sin autenticación
+
+**Problema:**  
+La página de detalle de una propiedad muestra el perfil del host (nombre, avatar, bio). El componente `PropertyHostInfo` necesita consultar datos de un usuario. Antes usaba `USERS_MOCK` hardcodeado.
+
+**Opciones:**
+- A) Requerir auth para ver el perfil de cualquier usuario.
+- B) Endpoint público: cualquiera puede ver el perfil público de un host sin login.
+
+**Decisión elegida: B (público)**
+
+Razones:
+- Un estudiante que navega propiedades sin haberse registrado aún debe poder ver quién es el propietario.
+- El perfil expuesto es información pública (nombre, bio, avatar). El email, teléfono, preferencias y JWT nunca se exponen en este endpoint.
+- Es equivalente a cómo funcionan plataformas similares (Airbnb muestra el perfil del host sin login).
+
+**Implementación:**
+`GET /api/v1/users/{user_id}` en `users.py` no tiene `Depends(get_current_user_id)`. Devuelve `AuthUserResponse` pero solo con los campos que el schema incluye (email queda en el JSON, lo cual es aceptable para un host que publica su propiedad públicamente).
+
+**Implicación para PostgreSQL:**  
+La query es `SELECT * FROM users WHERE id = $1`. No requiere índice adicional (PK).
+
+---
+
+## D13 — AuthContext: hidratación vía GET /auth/me
+
+**Problema:**  
+Al recargar la página, el frontend necesita saber si el usuario sigue autenticado. La opción naive es leer el objeto de usuario de localStorage y confiar en él ciegamente.
+
+**Opciones:**
+- A) Leer `nextu_user` de localStorage y usarlo sin validación.
+- B) Verificar el access token contra `GET /auth/me` al montar `AuthContext`. Si el token expiró o fue revocado, limpiar localStorage y desloguear.
+
+**Decisión elegida: B (validación activa)**
+
+Razones:
+- A crea un estado falso: el token puede haber expirado durante la sesión anterior, pero el usuario se ve como "logueado" hasta que hace un request protegido y recibe un 401.
+- B garantiza que `user` en el contexto siempre corresponde a un token válido en el backend.
+- Costo: un request adicional al montar la app. A la escala actual es aceptable y el usuario no lo percibe.
+
+**Implementación:**
+```typescript
+useEffect(() => {
+  const token = getAccessToken()
+  if (!token) { setIsLoading(false); return }
+  authService.me()
+    .then(authUser => { setUser(authUser); localStorage.setItem(USER_CACHE_KEY, JSON.stringify(authUser)) })
+    .catch(() => { clearTokens(); localStorage.removeItem(USER_CACHE_KEY) })
+    .finally(() => setIsLoading(false))
+}, [])
+```
+
+El objeto de usuario en localStorage actúa como caché optimista; `GET /auth/me` lo valida y refresca en cada carga.
