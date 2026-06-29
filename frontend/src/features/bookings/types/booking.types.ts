@@ -6,6 +6,9 @@ export interface Booking {
   propertyTitle: string | null
   propertyImage: string | null
   tenantId: number
+  tenantFirstName: string | null
+  tenantLastName: string | null
+  tenantEmail: string | null
   hostId: number
   startMonth: string         // 'YYYY-MM'
   durationMonths: number
