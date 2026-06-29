@@ -17,13 +17,19 @@ export const Step5Photos = ({ draft, update, onNext, onPrev }: StepProps) => {
 
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return
-    const newUrls = Array.from(files).map((file) => URL.createObjectURL(file))
-    update({ images: [...images, ...newUrls] })
+    const fileArray = Array.from(files)
+    const newUrls = fileArray.map((file) => URL.createObjectURL(file))
+    update({
+      images: [...images, ...newUrls],
+      imageFiles: [...(draft.imageFiles ?? []), ...fileArray],
+    })
   }
 
   const handleRemove = (index: number) => {
-    const updated = images.filter((_, i) => i !== index)
-    update({ images: updated })
+    update({
+      images: images.filter((_, i) => i !== index),
+      imageFiles: (draft.imageFiles ?? []).filter((_, i) => i !== index),
+    })
   }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
