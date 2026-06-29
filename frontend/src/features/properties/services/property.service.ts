@@ -1,4 +1,4 @@
-import { apiRequest } from '@/core/http/client'
+import { apiRequest, getAccessToken } from '@/core/http/client'
 import type { Property, PropertySearchFilters } from '../types/property.types'
 
 export const propertyService = {
@@ -42,5 +42,19 @@ export const propertyService = {
       method: 'POST',
       body: JSON.stringify(data),
     })
+  },
+
+  uploadImages: async (files: File[]): Promise<{ urls: string[] }> => {
+    const token = getAccessToken()
+    const form = new FormData()
+    files.forEach(f => form.append('files', f))
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
+    const res = await fetch(`${BASE_URL}/properties/upload-images`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    })
+    if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
+    return res.json() as Promise<{ urls: string[] }>
   },
 }

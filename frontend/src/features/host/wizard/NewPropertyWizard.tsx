@@ -24,6 +24,8 @@ const INITIAL_DRAFT: CreatePropertyDraft = {
   beds: 1,
   bathrooms: 1,
   amenities: [],
+  images: [],
+  imageFiles: [],
   title: '',
   description: '',
   pricePerNight: 50,
@@ -49,15 +51,25 @@ export const NewPropertyWizard = () => {
   const handleSubmit = async () => {
     if (!user) return
     setSubmitting(true)
-    await propertyService.create({
-      ...draft,
-      hostId: user.id,
-      shortDescription: draft.description.slice(0, 120),
-      images: [
-        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format',
-      ],
-    })
-    navigate('/host/properties')
+    try {
+      let images: string[] = draft.images?.filter(u => !u.startsWith('blob:')) ?? []
+      if (draft.imageFiles && draft.imageFiles.length > 0) {
+        const { urls } = await propertyService.uploadImages(draft.imageFiles)
+        images = urls
+      }
+      if (images.length === 0) {
+        images = ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format']
+      }
+      await propertyService.create({
+        ...draft,
+        hostId: user.id,
+        shortDescription: draft.description.slice(0, 120),
+        images,
+      })
+      navigate('/host/properties')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const stepProps = { draft, update, onNext: next, onPrev: prev }
