@@ -1,8 +1,8 @@
 from __future__ import annotations
-from app.repositories.base import UserRepository, NotificationRepository, ConversationRepository
+from app.repositories.base import UserRepository, NotificationRepository, ConversationRepository, PropertyRepository
 from app.models.user import LifestylePreferences
 from app.schemas.user import AuthUserResponse, LifestylePreferencesSchema, ProfileUpdateRequest, PersonalInfoUpdateRequest, PreferencesUpdateRequest
-from app.schemas.review import NotificationResponse, ConversationResponse, MessageResponse, SendMessageRequest
+from app.schemas.review import NotificationResponse, ConversationResponse, MessageResponse, SendMessageRequest, ParticipantInfo
 from app.models.conversation import Message
 from app.core.exceptions import not_found, conflict
 from app.services.auth import _to_auth_user
@@ -15,10 +15,18 @@ class UserService:
         user_repo: UserRepository,
         notif_repo: NotificationRepository,
         convo_repo: ConversationRepository,
+        property_repo: PropertyRepository | None = None,
     ) -> None:
         self._users = user_repo
         self._notifs = notif_repo
         self._convos = convo_repo
+        self._properties = property_repo
+
+    def get_public_profile(self, user_id: int) -> AuthUserResponse:
+        user = self._users.get_by_id(user_id)
+        if user is None:
+            raise not_found("User", user_id)
+        return _to_auth_user(user)
 
     def update_profile(self, user_id: int, req: ProfileUpdateRequest) -> AuthUserResponse:
         user = self._users.update_profile(user_id, req.first_name, req.last_name, req.phone, req.bio)
@@ -73,16 +81,35 @@ class UserService:
 
     def get_conversations(self, user_id: int) -> list[ConversationResponse]:
         convos = self._convos.get_by_user_id(user_id)
-        return [
-            ConversationResponse(
+        result = []
+        for c in convos:
+            prop_title: str | None = None
+            if self._properties is not None:
+                prop = self._properties.get_by_id(c.property_id)
+                if prop is not None:
+                    prop_title = prop.title
+
+            participants_info: list[ParticipantInfo] = []
+            for pid in c.participants:
+                u = self._users.get_by_id(pid)
+                if u is not None:
+                    participants_info.append(ParticipantInfo(
+                        id=u.id,
+                        first_name=u.first_name,
+                        last_name=u.last_name,
+                        avatar_url=u.avatar_url,
+                    ))
+
+            result.append(ConversationResponse(
                 id=c.id,
                 participants=c.participants,
+                participants_info=participants_info,
                 property_id=c.property_id,
+                property_title=prop_title,
                 messages=[MessageResponse(id=m.id, sender_id=m.sender_id, text=m.text, created_at=m.created_at) for m in c.messages],
                 last_message_at=c.last_message_at,
-            )
-            for c in convos
-        ]
+            ))
+        return result
 
     def send_message(self, conversation_id: int, req: SendMessageRequest) -> MessageResponse:
         convo = self._convos.get_by_id(conversation_id)

@@ -1,8 +1,14 @@
 import { apiRequest } from '@/core/http/client'
 import type { AuthUser } from '@/features/auth/types/auth.types'
-import type { ProfileUpdatePayload, PersonalInfoPayload, LifestylePreferences } from '../types/account.types'
-import type { Notification } from '@/mock/notifications.mock'
-import type { Conversation, Message } from '@/mock/messages.mock'
+import type {
+  ProfileUpdatePayload,
+  PersonalInfoPayload,
+  LifestylePreferences,
+  Notification,
+  Conversation,
+  Message,
+  PublicUser,
+} from '../types/account.types'
 
 export const accountService = {
   updateProfile: async (userId: number, data: ProfileUpdatePayload): Promise<AuthUser> => {
@@ -43,5 +49,9 @@ export const accountService = {
       method: 'POST',
       body: JSON.stringify({ senderId, text }),
     })
+  },
+
+  getPublicProfile: async (userId: number): Promise<PublicUser> => {
+    return apiRequest<PublicUser>(`/users/${userId}`)
   },
 }

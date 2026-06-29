@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react'
-import { USERS_MOCK } from '@/mock/users.mock'
+import { accountService } from '@/features/account/services/account.service'
 import { Avatar } from '@/shared/components/ui/Avatar'
 import { formatDate } from '@/shared/utils/formatters'
-import type { User } from '@/mock/users.mock'
+import type { PublicUser } from '@/features/account/types/account.types'
 
 interface PropertyHostInfoProps {
   hostId: number
 }
 
 export const PropertyHostInfo = ({ hostId }: PropertyHostInfoProps) => {
-  const [host, setHost] = useState<User | null>(null)
+  const [host, setHost] = useState<PublicUser | null>(null)
 
   useEffect(() => {
-    const found = USERS_MOCK.find(u => u.id === hostId) ?? null
-    setHost(found)
+    accountService.getPublicProfile(hostId).then(setHost).catch(() => setHost(null))
   }, [hostId])
 
   if (!host) return null

@@ -7,7 +7,7 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { Button } from '@/shared/components/ui/Button'
 import { formatDateTime } from '@/shared/utils/formatters'
 import { cn } from '@/shared/utils/cn'
-import type { Notification } from '@/mock/notifications.mock'
+import type { Notification } from '../types/account.types'
 
 export const NotificationsPage = () => {
   const { user } = useAuth()

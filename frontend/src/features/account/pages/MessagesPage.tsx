@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react'
 import { Send, MessageSquare } from 'lucide-react'
 import { useAuth } from '@/core/auth/useAuth'
 import { accountService } from '../services/account.service'
-import { USERS_MOCK } from '@/mock/users.mock'
-import { PROPERTIES_MOCK } from '@/mock/properties.mock'
 import { Spinner } from '@/shared/components/ui/Spinner'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { Avatar } from '@/shared/components/ui/Avatar'
 import { formatDateTime } from '@/shared/utils/formatters'
 import { cn } from '@/shared/utils/cn'
-import type { Conversation } from '@/mock/messages.mock'
+import type { Conversation } from '../types/account.types'
 
 export const MessagesPage = () => {
   const { user } = useAuth()
@@ -28,12 +26,8 @@ export const MessagesPage = () => {
   }, [user])
 
   const getOtherParticipant = (conv: Conversation) => {
-    const otherId = conv.participants.find(p => p !== user?.id) ?? 0
-    return USERS_MOCK.find(u => u.id === otherId)
+    return conv.participantsInfo.find(p => p.id !== user?.id) ?? null
   }
-
-  const getProperty = (conv: Conversation) =>
-    PROPERTIES_MOCK.find(p => p.id === conv.propertyId)
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,7 +65,6 @@ export const MessagesPage = () => {
           <div className="w-64 shrink-0 overflow-y-auto border-r border-gray-100">
             {conversations.map(conv => {
               const other = getOtherParticipant(conv)
-              const property = getProperty(conv)
               const lastMsg = conv.messages[conv.messages.length - 1]
               return (
                 <button
@@ -85,7 +78,7 @@ export const MessagesPage = () => {
                   <Avatar src={other?.avatarUrl} alt={other?.firstName} size="sm" />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-900 truncate">{other?.firstName}</p>
-                    <p className="text-xs text-gray-500 truncate">{property?.title ?? ''}</p>
+                    <p className="text-xs text-gray-500 truncate">{conv.propertyTitle ?? ''}</p>
                     {lastMsg && <p className="mt-0.5 text-xs text-gray-400 truncate">{lastMsg.text}</p>}
                   </div>
                 </button>
@@ -98,7 +91,7 @@ export const MessagesPage = () => {
             <div className="flex min-w-0 flex-1 flex-col">
               <div className="border-b border-gray-100 px-4 py-3">
                 <p className="font-medium text-gray-900">{getOtherParticipant(selected)?.firstName}</p>
-                <p className="text-xs text-gray-500">{getProperty(selected)?.title}</p>
+                <p className="text-xs text-gray-500">{selected.propertyTitle}</p>
               </div>
               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
                 {selected.messages.map(msg => (

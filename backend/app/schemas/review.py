@@ -39,10 +39,19 @@ class MessageResponse(BaseSchema):
     created_at: str
 
 
+class ParticipantInfo(BaseSchema):
+    id: int
+    first_name: str
+    last_name: str
+    avatar_url: str
+
+
 class ConversationResponse(BaseSchema):
     id: int
     participants: list[int]
+    participants_info: list[ParticipantInfo]
     property_id: int
+    property_title: str | None = None
     messages: list[MessageResponse]
     last_message_at: str
 
