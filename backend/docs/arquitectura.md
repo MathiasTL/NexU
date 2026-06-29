@@ -243,10 +243,10 @@ El tipo (`"access"` vs `"refresh"`) se verifica explícitamente para que un refr
 
 ```python
 CORSMiddleware(
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=settings.cors_origins_list,   # desde .env
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
 )
 ```
 
