@@ -65,8 +65,10 @@ npm run dev
 | `frontend/docs/contexto-migracion-nexu-v2.md` | Contexto completo de la migración y contratos de datos |
 | `frontend/docs/integracion-backend.md` | Guía de integración frontend ↔ backend |
 | `backend/docs/arquitectura.md` | Decisiones de arquitectura del backend |
-| `backend/docs/decisiones-tecnicas.md` | Decisiones técnicas D1–D10 |
+| `backend/docs/decisiones-tecnicas.md` | Decisiones técnicas D1–D13 |
 | `backend/docs/endpoints.md` | Referencia completa de endpoints API |
+| `backend/docs/migracion-bd.md` | Esquema de tablas y plan de migración a PostgreSQL |
+| `backend/docs/comparativa-oracle-vs-postgresql.md` | Comparativa tabla por tabla: Oracle legacy vs PostgreSQL NexU v2 |
 
 ## Levantar el proyecto legacy (solo referencia)
 
