@@ -27,3 +27,51 @@ export interface PersonalInfoPayload {
   email: string
   phone: string
 }
+
+export type NotificationType = 'new_booking' | 'booking_confirmed' | 'new_review' | 'checkin_reminder'
+
+export interface Notification {
+  id: number
+  userId: number
+  type: NotificationType
+  title: string
+  message: string
+  read: boolean
+  createdAt: string
+}
+
+export interface Message {
+  id: number
+  senderId: number
+  text: string
+  createdAt: string
+}
+
+export interface ParticipantInfo {
+  id: number
+  firstName: string
+  lastName: string
+  avatarUrl: string
+}
+
+export interface Conversation {
+  id: number
+  participants: number[]
+  participantsInfo: ParticipantInfo[]
+  propertyId: number
+  propertyTitle: string | null
+  messages: Message[]
+  lastMessageAt: string
+}
+
+export interface PublicUser {
+  id: number
+  email: string
+  firstName: string
+  lastName: string
+  role: string
+  avatarUrl: string
+  phone: string
+  bio: string
+  createdAt: string
+}

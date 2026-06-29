@@ -4,9 +4,9 @@ from app.schemas.user import AuthUserResponse, ProfileUpdateRequest, PersonalInf
 from app.schemas.review import NotificationResponse, ConversationResponse, MessageResponse, SendMessageRequest
 from app.services.user import UserService
 from app.api.deps import (
-    get_user_repo, get_notification_repo, get_conversation_repo, get_current_user_id,
+    get_user_repo, get_notification_repo, get_conversation_repo, get_property_repo, get_current_user_id,
 )
-from app.repositories.base import UserRepository, NotificationRepository, ConversationRepository
+from app.repositories.base import UserRepository, NotificationRepository, ConversationRepository, PropertyRepository
 
 router = APIRouter(tags=["users"])
 
@@ -15,9 +15,17 @@ def _get_service(
     user_repo: UserRepository = Depends(get_user_repo),
     notif_repo: NotificationRepository = Depends(get_notification_repo),
     convo_repo: ConversationRepository = Depends(get_conversation_repo),
+    property_repo: PropertyRepository = Depends(get_property_repo),
 ) -> UserService:
-    return UserService(user_repo, notif_repo, convo_repo)
+    return UserService(user_repo, notif_repo, convo_repo, property_repo)
 
+
+@router.get("/users/{user_id}", response_model=AuthUserResponse)
+def get_user_profile(
+    user_id: int,
+    svc: UserService = Depends(_get_service),
+) -> AuthUserResponse:
+    return svc.get_public_profile(user_id)
 
 
 @router.patch("/users/{user_id}/profile", response_model=AuthUserResponse)
