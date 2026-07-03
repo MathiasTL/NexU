@@ -84,7 +84,7 @@ class UserService:
         result = []
         for c in convos:
             prop_title: str | None = None
-            if self._properties is not None:
+            if self._properties is not None and c.property_id is not None:
                 prop = self._properties.get_by_id(c.property_id)
                 if prop is not None:
                     prop_title = prop.title

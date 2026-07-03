@@ -16,6 +16,6 @@ class Conversation(BaseModel):
 
     id: int
     participants: list[int]  # [User.id, User.id]
-    property_id: int
+    property_id: int | None = None  # None cuando es conversación entre roommates
     messages: list[Message]
     last_message_at: str  # ISO datetime

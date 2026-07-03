@@ -50,7 +50,7 @@ class ConversationResponse(BaseSchema):
     id: int
     participants: list[int]
     participants_info: list[ParticipantInfo]
-    property_id: int
+    property_id: int | None = None
     property_title: str | None = None
     messages: list[MessageResponse]
     last_message_at: str

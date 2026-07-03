@@ -27,3 +27,10 @@ class MemoryConversationRepository:
     def next_message_id(self) -> int:
         self._max_message_id += 1
         return self._max_message_id
+
+    def next_id(self) -> int:
+        return max(self._store.keys(), default=0) + 1
+
+    def create(self, conversation: Conversation) -> Conversation:
+        self._store[conversation.id] = conversation
+        return conversation
