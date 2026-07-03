@@ -7,13 +7,18 @@ humano y un desglose por dimensión para el radar comparativo.
 """
 from __future__ import annotations
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from app.models.user import LifestylePreferences
 from app.models.property import Property
-from app.repositories.base import UserRepository, PropertyRepository, ReviewRepository
+from app.repositories.base import (
+    UserRepository, PropertyRepository, ReviewRepository, ConversationRepository,
+)
 from app.services.property import _enrich as _enrich_property
 from app.schemas.matching import PropertyMatchResponse, RoommateMatchResponse
 from app.schemas.user import AuthUserResponse, LifestylePreferencesSchema
-from app.core.exceptions import conflict
+from app.schemas.review import ConversationResponse, MessageResponse, ParticipantInfo
+from app.models.conversation import Conversation
+from app.core.exceptions import conflict, not_found
 from app.services.ai_explainer import explain
 
 
@@ -155,16 +160,40 @@ def _auth_user(user) -> AuthUserResponse:
     )
 
 
+def _conversation_response(convo: Conversation, users: UserRepository) -> ConversationResponse:
+    participants_info: list[ParticipantInfo] = []
+    for pid in convo.participants:
+        u = users.get_by_id(pid)
+        if u is not None:
+            participants_info.append(ParticipantInfo(
+                id=u.id, first_name=u.first_name, last_name=u.last_name, avatar_url=u.avatar_url,
+            ))
+    return ConversationResponse(
+        id=convo.id,
+        participants=convo.participants,
+        participants_info=participants_info,
+        property_id=convo.property_id,
+        property_title=None,
+        messages=[
+            MessageResponse(id=m.id, sender_id=m.sender_id, text=m.text, created_at=m.created_at)
+            for m in convo.messages
+        ],
+        last_message_at=convo.last_message_at,
+    )
+
+
 class MatchingService:
     def __init__(
         self,
         user_repo: UserRepository,
         prop_repo: PropertyRepository,
         review_repo: ReviewRepository,
+        convo_repo: ConversationRepository | None = None,
     ) -> None:
         self._users = user_repo
         self._props = prop_repo
         self._reviews = review_repo
+        self._convos = convo_repo
 
     def _require_prefs(self, user_id: int):
         user = self._users.get_by_id(user_id)
@@ -203,3 +232,27 @@ class MatchingService:
             ))
         matches.sort(key=lambda m: m.score, reverse=True)
         return matches
+
+    def connect_roommate(self, user_id: int, target_id: int) -> ConversationResponse:
+        """Crea (o reutiliza) la conversación directa entre dos roommates."""
+        if self._convos is None:
+            raise conflict("Contacto no disponible")
+        if target_id == user_id:
+            raise conflict("No puedes contactarte contigo mismo")
+        if self._users.get_by_id(target_id) is None:
+            raise not_found("Usuario", target_id)
+
+        # Reutiliza una conversación existente entre ambos, si la hay.
+        for c in self._convos.get_by_user_id(user_id):
+            if target_id in c.participants:
+                return _conversation_response(c, self._users)
+
+        convo = Conversation(
+            id=self._convos.next_id(),
+            participants=[user_id, target_id],
+            property_id=None,
+            messages=[],
+            last_message_at=datetime.now(timezone.utc).isoformat(),
+        )
+        created = self._convos.create(convo)
+        return _conversation_response(created, self._users)
