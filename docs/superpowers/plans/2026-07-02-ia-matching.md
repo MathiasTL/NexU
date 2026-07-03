@@ -1817,5 +1817,5 @@ git commit -m "feat(frontend): UI de solicitudes de roommate (doble opt-in)"
 - [x] **Correr toda la suite backend:** `cd backend && .venv/Scripts/python.exe -m pytest tests/ -q` → **160 passed**.
 - [x] **Type-check frontend:** `cd frontend && npx tsc --noEmit` → sin errores (además `vite build` OK).
 - [x] **Actualizar el tablero de fases** al inicio de este documento con el estado final (Fases 1–7 ✅).
-- [ ] **Actualizar el README** raíz: marcar la funcionalidad de IA de matching como implementada y enlazar el spec. — pendiente del equipo (junto con los commits).
-- [ ] **Commits** (los ejecuta el equipo humano): todo el trabajo de Fases 4–7 está en el working tree sin commitear. Ver los `git add`/`git commit` descritos en cada tarea.
+- [x] **Actualizar el README** raíz: marcada la funcionalidad de IA de matching como implementada, con sección propia y enlaces al spec y al plan.
+- [x] **Commits**: Fases 4–7 commiteadas en `develop` como 11 commits por tarea (autor único) + un commit de docs; historial incremental reconstruido para que cada commit contenga su porción. Backend **160 tests verdes**, `tsc` OK.

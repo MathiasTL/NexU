@@ -16,6 +16,21 @@ Plataforma para que estudiantes encuentren habitaciones y departamentos cerca de
 - [x] Frontend React + Vite con mock data (Paso 1 y 2 completados)
 - [x] Backend FastAPI con datos en memoria — repositorios listos para PostgreSQL
 - [x] Integración frontend ↔ backend (servicios conectados al API real)
+- [x] **Matching con IA** — ranking estudiante↔habitación y estudiante↔roommate con radar de compatibilidad, explicación narrativa (Groq, con fallback) y contacto entre roommates (doble opt-in)
+
+## Matching con IA
+
+Funcionalidad que rankea habitaciones y roommates compatibles para cada estudiante:
+
+- **Scoring determinista** por dimensiones (universidad, presupuesto, ruido, estudio, etc.) con desglose para un **radar comparativo** (Recharts).
+- **Explicación en lenguaje natural** de cada match vía un LLM (Groq, API compatible con OpenAI); si no hay API key o falla, degrada a una plantilla — el matching nunca se cae.
+- **Contacto entre roommates** con doble opt-in (solicitud → aceptación) que crea una conversación in-app.
+- Endpoints: `GET /api/v1/matching/properties`, `GET /api/v1/matching/roommates`, `POST /api/v1/matching/roommates/{id}/request`, `GET /api/v1/matching/requests`, `POST /api/v1/matching/requests/{id}/accept|reject`.
+
+Configuración del LLM (opcional) en `backend/.env` — ver `backend/.env.example`:
+`LLM_API_KEY`, `LLM_BASE_URL` (por defecto Groq), `LLM_MODEL`. Sin key, se usa la explicación por plantilla.
+
+Diseño y plan de implementación: ver la tabla de [Documentación](#documentación).
 
 ## Levantar el proyecto
 
@@ -69,6 +84,8 @@ npm run dev
 | `backend/docs/endpoints.md` | Referencia completa de endpoints API |
 | `backend/docs/migracion-bd.md` | Esquema de tablas y plan de migración a PostgreSQL |
 | `backend/docs/comparativa-oracle-vs-postgresql.md` | Comparativa tabla por tabla: Oracle legacy vs PostgreSQL NexU v2 |
+| `docs/superpowers/specs/2026-07-02-ia-matching-design.md` | Diseño de la funcionalidad de matching con IA (habitación + roommate) |
+| `docs/superpowers/plans/2026-07-02-ia-matching.md` | Plan de implementación por fases del matching con IA |
 
 ## Levantar el proyecto legacy (solo referencia)
 
