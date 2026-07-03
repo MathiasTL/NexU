@@ -5,6 +5,7 @@ from app.repositories.memory.review import MemoryReviewRepository
 from app.repositories.memory.notification import MemoryNotificationRepository
 from app.repositories.memory.conversation import MemoryConversationRepository
 from app.repositories.memory.amenity import MemoryAmenityRepository
+from app.repositories.memory.connection_request import MemoryConnectionRequestRepository
 
 __all__ = [
     "MemoryUserRepository",
@@ -14,4 +15,5 @@ __all__ = [
     "MemoryNotificationRepository",
     "MemoryConversationRepository",
     "MemoryAmenityRepository",
+    "MemoryConnectionRequestRepository",
 ]

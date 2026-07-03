@@ -7,6 +7,7 @@ from app.models.review import Review
 from app.models.notification import Notification
 from app.models.conversation import Conversation, Message
 from app.models.amenity import AmenityCategory
+from app.models.connection_request import ConnectionRequest
 
 
 @runtime_checkable
@@ -81,3 +82,12 @@ class ConversationRepository(Protocol):
 @runtime_checkable
 class AmenityRepository(Protocol):
     def get_all_categories(self) -> list[AmenityCategory]: ...
+
+
+@runtime_checkable
+class ConnectionRequestRepository(Protocol):
+    def next_id(self) -> int: ...
+    def create(self, req: ConnectionRequest) -> ConnectionRequest: ...
+    def get_by_id(self, req_id: int) -> ConnectionRequest | None: ...
+    def get_incoming(self, user_id: int) -> list[ConnectionRequest]: ...
+    def set_status(self, req_id: int, status: str) -> ConnectionRequest | None: ...

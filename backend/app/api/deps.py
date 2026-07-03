@@ -6,6 +6,7 @@ from app.core.exceptions import unauthorized
 from app.repositories.base import (
     UserRepository, PropertyRepository, BookingRepository,
     ReviewRepository, NotificationRepository, ConversationRepository, AmenityRepository,
+    ConnectionRequestRepository,
 )
 from app.services.storage import StorageRepository
 
@@ -56,6 +57,10 @@ def get_conversation_repo(request: Request) -> ConversationRepository:
 
 def get_amenity_repo(request: Request) -> AmenityRepository:
     return request.app.state.amenity_repo  # type: ignore[no-any-return]
+
+
+def get_connection_request_repo(request: Request) -> ConnectionRequestRepository:
+    return request.app.state.connection_request_repo  # type: ignore[no-any-return]
 
 
 def get_storage_repo(request: Request) -> StorageRepository:

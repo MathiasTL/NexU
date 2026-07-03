@@ -37,3 +37,17 @@ class TestConnectEndpoint:
     def test_connect_requires_auth(self, client):
         r = client.post("/api/v1/matching/roommates/3/connect")
         assert r.status_code in (401, 403)
+
+
+class TestConnectionRequests:
+    def test_create_and_accept_request(self):
+        from app.models.connection_request import ConnectionRequest
+        from app.repositories.memory.connection_request import MemoryConnectionRequestRepository
+        repo = MemoryConnectionRequestRepository([])
+        req = repo.create(ConnectionRequest(
+            id=repo.next_id(), from_id=1, to_id=3, status="pending", created_at="2026-07-02",
+        ))
+        assert req.status == "pending"
+        assert any(r.id == req.id for r in repo.get_incoming(3))
+        updated = repo.set_status(req.id, "accepted")
+        assert updated is not None and updated.status == "accepted"

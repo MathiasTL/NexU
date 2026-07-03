@@ -13,6 +13,7 @@ from app.repositories.memory import (
     MemoryNotificationRepository,
     MemoryConversationRepository,
     MemoryAmenityRepository,
+    MemoryConnectionRequestRepository,
 )
 from app.services.storage import MemoryStorageRepository
 from mock_data import (
@@ -30,6 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.notification_repo = MemoryNotificationRepository(NOTIFICATIONS)
     app.state.conversation_repo = MemoryConversationRepository(CONVERSATIONS)
     app.state.amenity_repo = MemoryAmenityRepository(AMENITY_CATEGORIES)
+    app.state.connection_request_repo = MemoryConnectionRequestRepository([])
     app.state.storage_repo = MemoryStorageRepository()
     yield
 
