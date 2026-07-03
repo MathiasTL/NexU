@@ -1,6 +1,6 @@
 import { apiRequest } from '@/core/http/client'
 import type { Conversation } from '@/features/account/types/account.types'
-import type { PropertyMatch, RoommateMatch } from './types'
+import type { PropertyMatch, RoommateMatch, ConnectionRequest } from './types'
 
 /**
  * Error lanzado cuando el estudiante aún no completó su perfil de convivencia
@@ -34,4 +34,17 @@ export const matchingService = {
 
   connectRoommate: (targetId: number): Promise<Conversation> =>
     apiRequest<Conversation>(`/matching/roommates/${targetId}/connect`, { method: 'POST' }),
+
+  // ── Doble opt-in ──────────────────────────────────────────────────────────
+  requestRoommate: (targetId: number): Promise<ConnectionRequest> =>
+    apiRequest<ConnectionRequest>(`/matching/roommates/${targetId}/request`, { method: 'POST' }),
+
+  getIncomingRequests: (): Promise<ConnectionRequest[]> =>
+    apiRequest<ConnectionRequest[]>('/matching/requests'),
+
+  acceptRequest: (reqId: number): Promise<Conversation> =>
+    apiRequest<Conversation>(`/matching/requests/${reqId}/accept`, { method: 'POST' }),
+
+  rejectRequest: (reqId: number): Promise<ConnectionRequest> =>
+    apiRequest<ConnectionRequest>(`/matching/requests/${reqId}/reject`, { method: 'POST' }),
 }

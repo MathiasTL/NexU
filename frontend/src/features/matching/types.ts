@@ -16,3 +16,13 @@ export interface RoommateMatch {
   dimensions: Record<string, number>
   explanation: string
 }
+
+export type ConnectionStatus = 'pending' | 'accepted' | 'rejected'
+
+export interface ConnectionRequest {
+  id: number
+  fromId: number
+  toId: number
+  status: ConnectionStatus
+  createdAt: string
+}
