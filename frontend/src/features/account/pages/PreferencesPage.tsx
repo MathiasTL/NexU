@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/core/auth/useAuth'
+import { accountService } from '../services/account.service'
 import { LifestylePreferencesForm } from '../components/LifestylePreferencesForm'
 import type { LifestylePreferences } from '../types/account.types'
 
@@ -11,8 +12,8 @@ export const PreferencesPage = () => {
   const handleSave = async (prefs: LifestylePreferences) => {
     if (!user) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 400))
-    setAuthUser({ ...user, lifestylePreferences: prefs })
+    const updatedUser = await accountService.updatePreferences(user.id, prefs)
+    setAuthUser(updatedUser)
     setLoading(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)

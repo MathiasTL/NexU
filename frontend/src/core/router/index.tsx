@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/core/auth/ProtectedRoute'
 // Auth pages
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { OnboardingPreferencesPage } from '@/features/auth/pages/OnboardingPreferencesPage'
 
 // Property pages
 import { PropertiesHomePage } from '@/features/properties/pages/PropertiesHomePage'
@@ -52,6 +53,14 @@ export const router = createBrowserRouter([
       { path: 'properties/:id', element: <PropertyDetailPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
+      {
+        path: 'onboarding/preferencias',
+        element: (
+          <ProtectedRoute>
+            <OnboardingPreferencesPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: 'account',
         element: (

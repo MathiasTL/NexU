@@ -42,8 +42,12 @@ export const RegisterForm = ({ role, onChangeRole }: RegisterFormProps) => {
     setLoading(true)
     try {
       await authService.register({ firstName: firstName.trim(), lastName: lastName.trim(), email, password, role })
-      await login(email, password)
-      navigate('/', { replace: true })
+      const authUser = await login(email, password)
+      if (authUser.role === 'tenant' && !authUser.lifestylePreferences) {
+        navigate('/onboarding/preferencias', { replace: true })
+      } else {
+        navigate('/', { replace: true })
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrarse')
     } finally {
