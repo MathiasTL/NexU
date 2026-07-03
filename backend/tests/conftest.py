@@ -12,6 +12,22 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
+
+# ── Aislamiento del LLM ──────────────────────────────────────────────────────
+
+@pytest.fixture(autouse=True)
+def _disable_llm_in_tests(monkeypatch):
+    """
+    Los tests nunca deben llamar al LLM real (sería lento, con costo y no
+    determinista). Se fuerza el fallback por plantilla aunque exista una
+    LLM_API_KEY / GROQ_API_KEY en el entorno o en backend/.env. Los tests de
+    ai_explainer que ejercen la ruta del LLM la habilitan localmente con su
+    propio patch (cliente mockeado), así que este fixture no los afecta.
+    """
+    from app.services import ai_explainer
+    monkeypatch.setattr(ai_explainer.settings, "llm_api_key", "")
+
+
 # ── Cliente HTTP ─────────────────────────────────────────────────────────────
 
 @pytest.fixture(scope="session")
