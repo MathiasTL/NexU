@@ -1,4 +1,5 @@
 import { apiRequest } from '@/core/http/client'
+import type { Conversation } from '@/features/account/types/account.types'
 import type { PropertyMatch, RoommateMatch } from './types'
 
 /**
@@ -30,4 +31,7 @@ export const matchingService = {
 
   getRoommateMatches: (): Promise<RoommateMatch[]> =>
     fetchMatches<RoommateMatch>('/matching/roommates'),
+
+  connectRoommate: (targetId: number): Promise<Conversation> =>
+    apiRequest<Conversation>(`/matching/roommates/${targetId}/connect`, { method: 'POST' }),
 }

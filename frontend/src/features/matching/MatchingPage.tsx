@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, Home, Users, ArrowRight } from 'lucide-react'
+import { Sparkles, Home, Users, ArrowRight, MessageCircle } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
 import { CompatibilityRadar } from './components/CompatibilityRadar'
 import { matchingService, PreferencesRequiredError } from './matching.service'
 import type { PropertyMatch, RoommateMatch } from './types'
+
+type ConnectState = 'idle' | 'connecting' | 'error'
 
 function ScoreBadge({ score }: { score: number }) {
   return (
@@ -42,6 +44,17 @@ export const MatchingPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [properties, setProperties] = useState<PropertyMatch[]>([])
   const [roommates, setRoommates] = useState<RoommateMatch[]>([])
+  const [connecting, setConnecting] = useState<Record<number, ConnectState>>({})
+
+  const handleConnect = async (targetId: number) => {
+    setConnecting((s) => ({ ...s, [targetId]: 'connecting' }))
+    try {
+      await matchingService.connectRoommate(targetId)
+      navigate('/account/messages')
+    } catch {
+      setConnecting((s) => ({ ...s, [targetId]: 'error' }))
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -177,6 +190,18 @@ export const MatchingPage = () => {
                 <div className="mt-3">
                   <CompatibilityRadar dimensions={m.dimensions} labelA={m.user.firstName} />
                 </div>
+                <Button
+                  className="mt-3 w-full"
+                  variant="outline"
+                  size="sm"
+                  loading={connecting[m.user.id] === 'connecting'}
+                  onClick={() => handleConnect(m.user.id)}
+                >
+                  <MessageCircle className="mr-1.5 h-4 w-4" /> Contactar
+                </Button>
+                {connecting[m.user.id] === 'error' && (
+                  <p className="mt-1 text-center text-xs text-red-500">No se pudo iniciar el contacto. Intenta de nuevo.</p>
+                )}
               </article>
             ))}
           </div>
