@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pydantic import Field, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,7 +20,11 @@ class Settings(BaseSettings):
     storage_backend: str = "memory"
 
     # ── LLM (Groq, API compatible con OpenAI) ─────────────────────────────────
-    llm_api_key: str = ""                                   # GROQ_API_KEY / vacío = fallback
+    # Acepta LLM_API_KEY o GROQ_API_KEY (cualquiera de los dos); vacío = fallback.
+    llm_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("LLM_API_KEY", "GROQ_API_KEY"),
+    )
     llm_base_url: str = "https://api.groq.com/openai/v1"
     llm_model: str = "llama-3.1-8b-instant"
 
