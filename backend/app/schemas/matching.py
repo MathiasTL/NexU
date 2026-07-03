@@ -18,3 +18,11 @@ class RoommateMatchResponse(BaseSchema):
     reasons: list[str]
     dimensions: dict[str, int]
     explanation: str
+
+
+class ConnectionRequestResponse(BaseSchema):
+    id: int
+    from_id: int
+    to_id: int
+    status: str  # 'pending' | 'accepted' | 'rejected'
+    created_at: str

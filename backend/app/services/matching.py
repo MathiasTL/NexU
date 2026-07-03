@@ -12,13 +12,17 @@ from app.models.user import LifestylePreferences
 from app.models.property import Property
 from app.repositories.base import (
     UserRepository, PropertyRepository, ReviewRepository, ConversationRepository,
+    ConnectionRequestRepository,
 )
 from app.services.property import _enrich as _enrich_property
-from app.schemas.matching import PropertyMatchResponse, RoommateMatchResponse
+from app.schemas.matching import (
+    PropertyMatchResponse, RoommateMatchResponse, ConnectionRequestResponse,
+)
 from app.schemas.user import AuthUserResponse, LifestylePreferencesSchema
 from app.schemas.review import ConversationResponse, MessageResponse, ParticipantInfo
 from app.models.conversation import Conversation
-from app.core.exceptions import conflict, not_found
+from app.models.connection_request import ConnectionRequest
+from app.core.exceptions import conflict, not_found, forbidden
 from app.services.ai_explainer import explain
 
 
@@ -182,6 +186,13 @@ def _conversation_response(convo: Conversation, users: UserRepository) -> Conver
     )
 
 
+def _request_response(req: ConnectionRequest) -> ConnectionRequestResponse:
+    return ConnectionRequestResponse(
+        id=req.id, from_id=req.from_id, to_id=req.to_id,
+        status=req.status, created_at=req.created_at,
+    )
+
+
 class MatchingService:
     def __init__(
         self,
@@ -189,11 +200,13 @@ class MatchingService:
         prop_repo: PropertyRepository,
         review_repo: ReviewRepository,
         convo_repo: ConversationRepository | None = None,
+        request_repo: ConnectionRequestRepository | None = None,
     ) -> None:
         self._users = user_repo
         self._props = prop_repo
         self._reviews = review_repo
         self._convos = convo_repo
+        self._requests = request_repo
 
     def _require_prefs(self, user_id: int):
         user = self._users.get_by_id(user_id)
@@ -256,3 +269,46 @@ class MatchingService:
         )
         created = self._convos.create(convo)
         return _conversation_response(created, self._users)
+
+    # ── Doble opt-in (solicitud → aceptación) ─────────────────────────────────
+
+    def request_roommate(self, from_id: int, to_id: int) -> ConnectionRequestResponse:
+        if self._requests is None:
+            raise conflict("Solicitudes no disponibles")
+        if to_id == from_id:
+            raise conflict("No puedes enviarte una solicitud a ti mismo")
+        if self._users.get_by_id(to_id) is None:
+            raise not_found("Usuario", to_id)
+        req = self._requests.create(ConnectionRequest(
+            id=self._requests.next_id(),
+            from_id=from_id,
+            to_id=to_id,
+            status="pending",
+            created_at=datetime.now(timezone.utc).isoformat(),
+        ))
+        return _request_response(req)
+
+    def list_incoming(self, user_id: int) -> list[ConnectionRequestResponse]:
+        if self._requests is None:
+            raise conflict("Solicitudes no disponibles")
+        return [_request_response(r) for r in self._requests.get_incoming(user_id)]
+
+    def accept_request(self, user_id: int, req_id: int) -> ConversationResponse:
+        req = self._require_request(user_id, req_id)
+        self._requests.set_status(req.id, "accepted")  # type: ignore[union-attr]
+        return self.connect_roommate(req.from_id, req.to_id)
+
+    def reject_request(self, user_id: int, req_id: int) -> ConnectionRequestResponse:
+        req = self._require_request(user_id, req_id)
+        updated = self._requests.set_status(req.id, "rejected")  # type: ignore[union-attr]
+        return _request_response(updated or req)
+
+    def _require_request(self, user_id: int, req_id: int) -> ConnectionRequest:
+        if self._requests is None:
+            raise conflict("Solicitudes no disponibles")
+        req = self._requests.get_by_id(req_id)
+        if req is None:
+            raise not_found("Solicitud", req_id)
+        if req.to_id != user_id:
+            raise forbidden("Solo el destinatario puede responder esta solicitud")
+        return req
