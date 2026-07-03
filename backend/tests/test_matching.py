@@ -150,3 +150,12 @@ class TestMockDataVolume:
             u for u in USERS if u.role == "tenant" and u.lifestyle_preferences is not None
         ]
         assert len(tenants_with_prefs) >= 12
+
+
+class TestExplainerWired:
+    def test_property_match_uses_explainer(self):
+        from unittest.mock import patch
+        with patch("app.services.matching.explain", return_value="Texto IA de prueba") as mk:
+            matches = _service().rank_properties(user_id=1)
+            assert matches[0].explanation == "Texto IA de prueba"
+            assert mk.called

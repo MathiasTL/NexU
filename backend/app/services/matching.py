@@ -14,6 +14,7 @@ from app.services.property import _enrich as _enrich_property
 from app.schemas.matching import PropertyMatchResponse, RoommateMatchResponse
 from app.schemas.user import AuthUserResponse, LifestylePreferencesSchema
 from app.core.exceptions import conflict
+from app.services.ai_explainer import explain
 
 
 @dataclass(frozen=True)
@@ -135,12 +136,6 @@ def score_roommate(a: LifestylePreferences, b: LifestylePreferences) -> ScoreBre
     return ScoreBreakdown(score=round(total), reasons=reasons, dimensions=dimensions)
 
 
-def _fallback_explanation(reasons: list[str]) -> str:
-    if not reasons:
-        return "Compatibilidad calculada según tu perfil de convivencia."
-    return " · ".join(reasons)
-
-
 def _auth_user(user) -> AuthUserResponse:
     prefs = None
     if user.lifestyle_preferences:
@@ -188,7 +183,7 @@ class MatchingService:
             matches.append(PropertyMatchResponse(
                 property=_enrich_property(prop, self._reviews),
                 score=bd.score, reasons=bd.reasons, dimensions=bd.dimensions,
-                explanation=_fallback_explanation(bd.reasons),
+                explanation=explain(f"la habitación '{prop.title}'", bd.reasons),
             ))
         matches.sort(key=lambda m: m.score, reverse=True)
         return matches
@@ -204,7 +199,7 @@ class MatchingService:
             matches.append(RoommateMatchResponse(
                 user=_auth_user(other),
                 score=bd.score, reasons=bd.reasons, dimensions=bd.dimensions,
-                explanation=_fallback_explanation(bd.reasons),
+                explanation=explain(f"el/la compañero(a) {other.first_name}", bd.reasons),
             ))
         matches.sort(key=lambda m: m.score, reverse=True)
         return matches
