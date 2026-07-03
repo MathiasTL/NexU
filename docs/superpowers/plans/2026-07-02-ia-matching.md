@@ -37,11 +37,20 @@ Este plan lo pueden ejecutar varios compañeros. Para saber dónde quedó el ant
 |---|---|---|---|
 | 1 | Scoring backend + endpoints | ✅ | Mathias |
 | 2 | Ampliar datos mock | ✅ | Mathias |
-| 3 | Onboarding + gate de preferencias | ⬜ | |
-| 4 | Explicación IA (Groq + fallback) | ⬜ | |
-| 5 | Radar comparativo (frontend) | ⬜ | |
-| 6 | Contacto roommate — Fase 1 (directo) | ⬜ | |
-| 7 | Contacto roommate — Fase 2 (doble opt-in) | ⬜ | |
+| 3 | Onboarding + gate de preferencias | ✅ | Mathias |
+| 4 | Explicación IA (Groq + fallback) | ✅ | David |
+| 5 | Radar comparativo (frontend) | ✅ | David |
+| 6 | Contacto roommate — Fase 1 (directo) | ✅ | David |
+| 7 | Contacto roommate — Fase 2 (doble opt-in) | ✅ | David |
+
+> **Leyenda de estado:** ✅ hecho y verificado · 🟡 implementado y verificado con tests/`tsc`/`build`, falta solo la verificación manual E2E con ambos servidores levantados · ⬜ pendiente.
+> **Verificación E2E (2026-07-03):** Fases 5, 6 y 7 verificadas en vivo (uvicorn + vite + navegador). `/matching`
+> renderiza habitaciones y roommates rankeados con scores, explicaciones, chips y radares Recharts;
+> host sin prefs ve el CTA "Completa tu perfil" (409); el enlace "Para ti" se oculta sin sesión. **Doble
+> opt-in:** Ana envía solicitud (`POST .../request` 201 → "Solicitud enviada"), Valeria la ve en su bandeja
+> ("Ana García quiere conectar contigo") y al Aceptar (`POST .../requests/{id}/accept` 200) se crea la
+> conversación de roommate (sin propiedad) y navega a Mensajes.
+> **Commits:** todo el trabajo de Fases 3–7 está en el working tree **sin commitear** (los commits los hace el equipo humano). Backend: **160 tests verdes**. Frontend: `tsc --noEmit` + `vite build` OK.
 
 ---
 
@@ -808,7 +817,7 @@ git commit -m "feat(mock): ampliar a ~16 usuarios con preferencias variadas para
 
 ## Task 7: Onboarding de preferencias tras registro (frontend)
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit `45a3cb4`) | **Responsable:** Mathias | **Fecha:** 2026-07-03
 
 **Files:**
 - Modify: el flujo de registro del frontend (buscar el componente/página que maneja `register`; típicamente `frontend/src/features/auth/`).
@@ -818,17 +827,17 @@ git commit -m "feat(mock): ampliar a ~16 usuarios con preferencias variadas para
 - Consumes: respuesta de registro (`AuthResponse` con `user`), servicio de auth, servicio de perfil/preferencias existente.
 - Produces: tras registro, si `user.lifestylePreferences == null` y `user.role === 'tenant'`, se muestra/redirige al formulario de preferencias antes de entrar a la app.
 
-- [ ] **Step 1: Localizar el flujo de registro**
+- [x] **Step 1: Localizar el flujo de registro**
 
 Run: `cd frontend && grep -rn "register" src/features/auth src/services 2>/dev/null | head`
 Identifica dónde se procesa la respuesta de registro y dónde se navega tras el éxito.
 
-- [ ] **Step 2: Localizar el formulario/servicio de preferencias existente**
+- [x] **Step 2: Localizar el formulario/servicio de preferencias existente**
 
 Run: `cd frontend && grep -rln "preferences" src | head`
 Confirma el componente de edición de preferencias y el servicio que hace `PATCH .../preferences` (ya existe porque la edición de perfil funciona).
 
-- [ ] **Step 3: Redirigir a onboarding tras registro**
+- [x] **Step 3: Redirigir a onboarding tras registro**
 
 En el handler de registro exitoso, tras guardar la sesión, comprueba:
 
@@ -842,11 +851,11 @@ if (response.user.role === 'tenant' && !response.user.lifestylePreferences) {
 
 Registra la ruta `/onboarding/preferencias` en el router del frontend, apuntando al componente de preferencias existente (reutilizado en modo "onboarding": al guardar, navega a `/`).
 
-- [ ] **Step 4: Verificar el flujo manualmente**
+- [x] **Step 4: Verificar el flujo manualmente**
 
 Run: levantar backend (`uvicorn app.main:app --reload`) y frontend (`npm run dev`). Registrar un tenant nuevo → debe caer en `/onboarding/preferencias`. Al guardar preferencias → entra a la app y `/api/v1/matching/roommates` responde 200 (no 409).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit** — hecho en `45a3cb4 feat(onboarding): prix persistencia (Fase 3)`
 
 ```bash
 git add frontend/src
@@ -859,7 +868,7 @@ git commit -m "feat(onboarding): pedir preferencias de convivencia tras registro
 
 ## Task 8: Configuración del LLM
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Modify: `backend/app/config.py`
@@ -868,14 +877,14 @@ git commit -m "feat(onboarding): pedir preferencias de convivencia tras registro
 **Interfaces:**
 - Produces: `settings.llm_api_key`, `settings.llm_base_url`, `settings.llm_model`, `settings.llm_enabled`.
 
-- [ ] **Step 1: Añadir la dependencia**
+- [x] **Step 1: Añadir la dependencia**
 
 Añade `openai>=1.0.0` a `backend/requirements.txt` y al array `dependencies` de `backend/pyproject.toml`. Luego:
 
 Run: `cd backend && pip install -r requirements.txt`
 Expected: instala `openai` sin errores.
 
-- [ ] **Step 2: Añadir settings del LLM**
+- [x] **Step 2: Añadir settings del LLM**
 
 En `backend/app/config.py`, dentro de `Settings`, añade:
 
@@ -889,12 +898,12 @@ En `backend/app/config.py`, dentro de `Settings`, añade:
         return bool(self.llm_api_key)
 ```
 
-- [ ] **Step 3: Verificar que carga**
+- [x] **Step 3: Verificar que carga** — verificado: imprime `False https://api.groq.com/openai/v1`.
 
 Run: `cd backend && python -c "from app.config import settings; print(settings.llm_enabled, settings.llm_base_url)"`
 Expected: imprime `False https://api.groq.com/openai/v1` (sin key → fallback activo).
 
-- [ ] **Step 4: Documentar la variable**
+- [x] **Step 4: Documentar la variable**
 
 Añade a `backend/.env.example` (créalo si no existe) las líneas:
 
@@ -904,7 +913,7 @@ LLM_BASE_URL=https://api.groq.com/openai/v1
 LLM_MODEL=llama-3.1-8b-instant
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/config.py backend/requirements.txt backend/pyproject.toml backend/.env.example
@@ -915,7 +924,7 @@ git commit -m "chore(llm): configuracion de Groq (base_url compatible OpenAI) co
 
 ## Task 9: `ai_explainer` con Groq + fallback a plantilla
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Create: `backend/app/services/ai_explainer.py`
@@ -926,7 +935,7 @@ git commit -m "chore(llm): configuracion de Groq (base_url compatible OpenAI) co
 - Produces:
   - `explain(context: str, reasons: list[str]) -> str` — devuelve texto narrativo del LLM, o `" · ".join(reasons)` si el LLM está deshabilitado o falla.
 
-- [ ] **Step 1: Escribir el test que falla**
+- [x] **Step 1: Escribir el test que falla**
 
 Crea `backend/tests/test_ai_explainer.py`:
 
@@ -967,12 +976,12 @@ class TestLLMPath:
                 fake.chat.completions.create.assert_called_once()
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla**
 
 Run: `cd backend && python -m pytest tests/test_ai_explainer.py -v`
 Expected: FAIL con `ModuleNotFoundError: No module named 'app.services.ai_explainer'`.
 
-- [ ] **Step 3: Implementar el explainer**
+- [x] **Step 3: Implementar el explainer**
 
 Crea `backend/app/services/ai_explainer.py`:
 
@@ -1032,12 +1041,12 @@ def explain(context: str, reasons: list[str]) -> str:
         return _fallback(reasons)
 ```
 
-- [ ] **Step 4: Correr los tests y verificar que pasan**
+- [x] **Step 4: Correr los tests y verificar que pasan** — verificado: 3 passed.
 
 Run: `cd backend && python -m pytest tests/test_ai_explainer.py -v`
 Expected: PASS (3 tests).
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/services/ai_explainer.py backend/tests/test_ai_explainer.py
@@ -1048,7 +1057,7 @@ git commit -m "feat(matching): ai_explainer con Groq y fallback a plantilla dete
 
 ## Task 10: Conectar el explainer al MatchingService
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Modify: `backend/app/services/matching.py`
@@ -1058,7 +1067,7 @@ git commit -m "feat(matching): ai_explainer con Groq y fallback a plantilla dete
 - Consumes: `ai_explainer.explain`.
 - Produces: `PropertyMatchResponse.explanation` / `RoommateMatchResponse.explanation` ahora provienen de `explain(...)`. Con LLM deshabilitado (default en tests) el resultado sigue siendo las razones unidas → los tests existentes de la Fase 1 siguen pasando.
 
-- [ ] **Step 1: Escribir el test que falla**
+- [x] **Step 1: Escribir el test que falla**
 
 Añade a `backend/tests/test_matching.py`:
 
@@ -1072,12 +1081,12 @@ class TestExplainerWired:
             assert mk.called
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla**
 
 Run: `cd backend && python -m pytest tests/test_matching.py::TestExplainerWired -v`
 Expected: FAIL (aún no se importa `explain` en `matching.py`).
 
-- [ ] **Step 3: Cablear el explainer**
+- [x] **Step 3: Cablear el explainer** (se eliminó `_fallback_explanation`, ya sin uso)
 
 En `backend/app/services/matching.py`:
 
@@ -1096,12 +1105,12 @@ En `backend/app/services/matching.py`:
 
 (Puedes eliminar `_fallback_explanation` si ya no se usa, o dejarlo — el explainer tiene su propio fallback interno.)
 
-- [ ] **Step 4: Correr toda la suite y verificar que pasa**
+- [x] **Step 4: Correr toda la suite y verificar que pasa** — verificado: 151 passed.
 
 Run: `cd backend && python -m pytest tests/ -v`
 Expected: PASS (incluidos los tests de la Fase 1: con LLM deshabilitado, `explain` devuelve las razones unidas, que siguen conteniendo cada razón).
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/services/matching.py backend/tests/test_matching.py
@@ -1114,7 +1123,11 @@ git commit -m "feat(matching): usar ai_explainer para la explicacion narrativa d
 
 ## Task 11: Instalar Recharts y tipos del match
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
+
+> **Nota del ejecutor:** el proyecto usa **pnpm** (hay `pnpm-lock.yaml`), no npm. Instalar con
+> `pnpm add recharts` (npm falla con `EUNSUPPORTEDPROTOCOL workspace:*`). Se instaló `recharts@3.9.1`.
+> El tipo `AuthUser` real vive en `@/features/auth/types/auth.types` (no en `account`); los tipos lo importan de ahí.
 
 **Files:**
 - Modify: `frontend/package.json`
@@ -1123,12 +1136,12 @@ git commit -m "feat(matching): usar ai_explainer para la explicacion narrativa d
 **Interfaces:**
 - Produces: tipos TS `PropertyMatch`, `RoommateMatch` que reflejan los schemas del backend (camelCase).
 
-- [ ] **Step 1: Instalar Recharts**
+- [x] **Step 1: Instalar Recharts** — hecho con `pnpm add recharts` → `recharts@3.9.1`.
 
 Run: `cd frontend && npm install recharts`
 Expected: agrega `recharts` a `dependencies` en `package.json`.
 
-- [ ] **Step 2: Crear los tipos**
+- [x] **Step 2: Crear los tipos** (import de `AuthUser` desde `@/features/auth/types/auth.types`)
 
 Crea `frontend/src/features/matching/types.ts`:
 
@@ -1155,15 +1168,15 @@ export interface RoommateMatch {
 
 > Nota: ajusta las rutas de import de `Property` y `AuthUser` a como estén nombradas en el proyecto (verifícalo con `grep -rn "export interface Property" frontend/src` y equivalente para el usuario).
 
-- [ ] **Step 3: Verificar el build de tipos**
+- [x] **Step 3: Verificar el build de tipos** — verificado: `tsc --noEmit` sin errores + `vite build` OK.
 
 Run: `cd frontend && npx tsc --noEmit`
 Expected: sin errores (o solo los preexistentes ajenos a estos archivos).
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Commit** (lo ejecuta el equipo humano — el lockfile es `pnpm-lock.yaml`, no `package-lock.json`)
 
 ```bash
-git add frontend/package.json frontend/package-lock.json frontend/src/features/matching/types.ts
+git add frontend/package.json frontend/pnpm-lock.yaml frontend/src/features/matching/types.ts
 git commit -m "chore(frontend): instalar recharts y tipos de match"
 ```
 
@@ -1171,7 +1184,7 @@ git commit -m "chore(frontend): instalar recharts y tipos de match"
 
 ## Task 12: Componente de radar comparativo
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Create: `frontend/src/features/matching/components/CompatibilityRadar.tsx`
@@ -1181,7 +1194,7 @@ git commit -m "chore(frontend): instalar recharts y tipos de match"
 - Produces: `<CompatibilityRadar dimensions={...} compareDimensions={...} labelA labelB />`.
   - Una serie si solo `dimensions` (caso habitación); dos series si además `compareDimensions` (caso roommate).
 
-- [ ] **Step 1: Crear el componente**
+- [x] **Step 1: Crear el componente**
 
 Crea `frontend/src/features/matching/components/CompatibilityRadar.tsx`:
 
@@ -1227,12 +1240,12 @@ export function CompatibilityRadar({ dimensions, compareDimensions, labelA = 'Co
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos** — verificado con `tsc --noEmit` + `vite build`.
 
 Run: `cd frontend && npx tsc --noEmit`
 Expected: sin errores nuevos.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add frontend/src/features/matching/components/CompatibilityRadar.tsx
@@ -1243,7 +1256,7 @@ git commit -m "feat(frontend): componente CompatibilityRadar (1 o 2 series)"
 
 ## Task 13: Servicio + página de matching que consume el API
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho y verificado E2E (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Create: `frontend/src/features/matching/matching.service.ts`
@@ -1254,12 +1267,12 @@ git commit -m "feat(frontend): componente CompatibilityRadar (1 o 2 series)"
 - Consumes: el cliente HTTP del proyecto (mismo patrón que otros `*.service.ts`), `PropertyMatch`, `RoommateMatch`, `CompatibilityRadar`.
 - Produces: página `/matching` con dos secciones (habitaciones y roommates), cada tarjeta con `score`, `explanation`, chips de `reasons` y el radar.
 
-- [ ] **Step 1: Localizar el patrón de servicio HTTP existente**
+- [x] **Step 1: Localizar el patrón de servicio HTTP existente** — se reutiliza `apiRequest<T>` de `@/core/http/client` (mismo patrón que `property.service.ts`).
 
 Run: `cd frontend && ls src/features/*/**.service.ts src/services 2>/dev/null; grep -rln "VITE_API_BASE_URL\|api.get\|fetch(" src/services src/features | head`
 Copia el patrón (base URL + header Authorization) de un servicio existente.
 
-- [ ] **Step 2: Crear el servicio de matching**
+- [x] **Step 2: Crear el servicio de matching** (expone `matchingService.getPropertyMatches/getRoommateMatches` + `PreferencesRequiredError` para el 409)
 
 Crea `frontend/src/features/matching/matching.service.ts` siguiendo el patrón encontrado. Debe exponer:
 
@@ -1278,7 +1291,7 @@ export async function getRoommateMatches(): Promise<RoommateMatch[]> {
 
 Implementa el cuerpo reutilizando el cliente HTTP del proyecto (el mismo que usan los otros servicios ya conectados al backend).
 
-- [ ] **Step 3: Crear la página**
+- [x] **Step 3: Crear la página** (MVP: radar de 1 serie `dimensions` en ambas secciones, según la nota de MVP)
 
 Crea `frontend/src/features/matching/MatchingPage.tsx` que:
 1. Al montar, llama `getPropertyMatches()` y `getRoommateMatches()`.
@@ -1291,21 +1304,30 @@ Crea `frontend/src/features/matching/MatchingPage.tsx` que:
 
 > MVP simple y suficiente: mostrar `<CompatibilityRadar dimensions={match.dimensions} />` (1 serie) en ambas secciones. La 2ª serie de roommate se puede añadir después si se expone el desglose del propio usuario.
 
-- [ ] **Step 4: Registrar ruta y enlace de menú**
+- [x] **Step 4: Registrar ruta y enlace de menú** — ruta `/matching` protegida en el router + enlace "Para ti" en `Navbar.tsx` (solo autenticados).
 
 Añade la ruta `/matching` al router del frontend apuntando a `MatchingPage`, y un enlace en la navegación (p. ej. "Para ti" o "Matches").
 
-- [ ] **Step 5: Verificar el flujo manualmente**
+- [x] **Step 5: Verificar el flujo manualmente** — ✅ verificado E2E (2026-07-03): Ana ve habitaciones y roommates rankeados con radares; host Carlos (sin prefs) ve el CTA "Completa tu perfil" (409).
 
 Run: backend + frontend levantados. Loguéate como `ana.garcia@pucp.pe` / `password123`, entra a `/matching`:
 - Deben aparecer habitaciones y roommates rankeados con badge de score, explicación y radar.
 - Loguéate como host sin preferencias → debe verse el CTA "Completa tu perfil" (409 manejado).
 
-- [ ] **Step 6: Deprecar `compatibility.ts`**
+- [x] **Step 6: Deprecar `compatibility.ts`** — hecho. `compatibility.ts` eliminado; sin referencias; `tsc --noEmit` + `vite build` OK.
 
 Ahora que el backend es la fuente de verdad, elimina los usos de `calcCompatibility` en `PropertyCard.tsx` y `RecommendationsPage.tsx` (reemplázalos por el `score`/`reasons` que ya viene del API donde aplique), y borra `frontend/src/features/properties/utils/compatibility.ts`.
 
 Run: `cd frontend && grep -rn "calcCompatibility\|compatibility" src` → no debe quedar ninguna referencia. Luego `npx tsc --noEmit` sin errores.
+
+> **Nota del ejecutor (decisión tomada):** El wizard de `RecommendationsPage` calculaba el score con
+> preferencias **ad-hoc** que recoge en sus pasos, no con las preferencias almacenadas del usuario
+> (que es lo que consume `GET /matching/properties`). Por eso no era un reemplazo 1:1 por el endpoint.
+> Decisión aplicada: `RecommendationsPage` ahora muestra los resultados **filtrados por el servidor**
+> (`propertyService.search`) sin el overlay de "% compatible" client-side, con un aviso que enlaza a
+> `/matching` ("Para ti") para el porcentaje real y los roommates. El badge de `%` compatible en
+> `PropertyCard` se **eliminó** (era client-side); el porcentaje ahora vive solo en `/matching`, con el
+> backend como fuente única de verdad.
 
 - [ ] **Step 7: Commit**
 
@@ -1320,7 +1342,12 @@ git commit -m "feat(frontend): pagina de matching con radar; deprecar compatibil
 
 ## Task 14: `Conversation.property_id` opcional + crear conversación (repos)
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
+
+> **Nota del ejecutor:** además del modelo, se hizo `property_id` opcional en el schema
+> `ConversationResponse` (`app/schemas/review.py`) y se guardó `get_conversations` en
+> `app/services/user.py` contra `property_id=None`. Los mocks se importan con `from mock_data import ...`
+> (no `app.mock_data`).
 
 **Files:**
 - Modify: `backend/app/models/conversation.py`
@@ -1334,7 +1361,7 @@ git commit -m "feat(frontend): pagina de matching con radar; deprecar compatibil
   - `ConversationRepository.create(conversation: Conversation) -> Conversation` y `next_id() -> int`.
   - `MemoryConversationRepository` implementa ambos.
 
-- [ ] **Step 1: Escribir el test que falla**
+- [x] **Step 1: Escribir el test que falla**
 
 Crea `backend/tests/test_matching_contact.py`:
 
@@ -1358,12 +1385,12 @@ def test_create_conversation_without_property():
     assert repo.get_by_id(new_id) is not None
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla**
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py -v`
 Expected: FAIL (`property_id` no acepta None, o `create`/`next_id` no existen).
 
-- [ ] **Step 3: Hacer `property_id` opcional**
+- [x] **Step 3: Hacer `property_id` opcional** (se usó `int | None = None`; también en `ConversationResponse`)
 
 En `backend/app/models/conversation.py`, cambia:
 
@@ -1371,7 +1398,7 @@ En `backend/app/models/conversation.py`, cambia:
     property_id: int | None  # None cuando es conversación entre roommates
 ```
 
-- [ ] **Step 4: Añadir `create`/`next_id` al Protocol**
+- [x] **Step 4: Añadir `create`/`next_id` al Protocol**
 
 En `backend/app/repositories/base.py`, dentro de `ConversationRepository`, añade:
 
@@ -1380,7 +1407,7 @@ En `backend/app/repositories/base.py`, dentro de `ConversationRepository`, añad
     def next_id(self) -> int: ...
 ```
 
-- [ ] **Step 5: Implementar en memoria**
+- [x] **Step 5: Implementar en memoria**
 
 En `backend/app/repositories/memory/conversation.py`, añade a `MemoryConversationRepository`:
 
@@ -1395,15 +1422,15 @@ En `backend/app/repositories/memory/conversation.py`, añade a `MemoryConversati
 
 (Ajusta `self._store` al nombre real del dict interno del repo; revisa el `__init__`.)
 
-- [ ] **Step 6: Correr los tests y verificar que pasan**
+- [x] **Step 6: Correr los tests y verificar que pasan** — verificado: 13 passed (contact + messages).
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py tests/test_messages.py -v`
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Commit** (lo ejecuta el equipo humano — incluir también `app/schemas/review.py` y `app/services/user.py`)
 
 ```bash
-git add backend/app/models/conversation.py backend/app/repositories/base.py backend/app/repositories/memory/conversation.py backend/tests/test_matching_contact.py
+git add backend/app/models/conversation.py backend/app/repositories/base.py backend/app/repositories/memory/conversation.py backend/app/schemas/review.py backend/app/services/user.py backend/tests/test_matching_contact.py
 git commit -m "feat(chat): property_id opcional y creacion de conversaciones para roommates"
 ```
 
@@ -1411,7 +1438,13 @@ git commit -m "feat(chat): property_id opcional y creacion de conversaciones par
 
 ## Task 15: Endpoint `POST /matching/roommates/{id}/connect` (contacto directo)
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
+
+> **Nota del ejecutor:** el servicio devuelve un `ConversationResponse` ya enriquecido
+> (`participants_info`) vía el helper `_conversation_response`, en vez del modelo `Conversation` crudo
+> (que no trae `participants_info`/`property_title`). `connect_roommate` es **idempotente**: reutiliza la
+> conversación existente entre ambos si ya la hay. Se omitió la notificación al destinatario (opcional en
+> el plan) para mantener el MVP; se puede añadir con `NotificationRepository` más adelante.
 
 **Files:**
 - Modify: `backend/app/api/v1/matching.py`
@@ -1425,7 +1458,7 @@ git commit -m "feat(chat): property_id opcional y creacion de conversaciones par
     crea (o reutiliza) la conversación entre ambos y devuelve su representación.
   - `POST /api/v1/matching/roommates/{id}/connect` → `201` con la conversación.
 
-- [ ] **Step 1: Escribir el test que falla**
+- [x] **Step 1: Escribir el test que falla** (se añadió también `test_connect_is_idempotent`)
 
 Añade a `backend/tests/test_matching_contact.py`:
 
@@ -1445,12 +1478,12 @@ class TestConnectEndpoint:
         assert r.status_code in (401, 403)
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla**
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py::TestConnectEndpoint -v`
 Expected: FAIL con 404 (ruta no existe).
 
-- [ ] **Step 3: Añadir `connect_roommate` al servicio**
+- [x] **Step 3: Añadir `connect_roommate` al servicio** — implementado devolviendo `ConversationResponse` enriquecido (no el `Conversation` crudo), con validaciones (no self, target existe) y uso de `datetime.now(timezone.utc)`.
 
 En `backend/app/services/matching.py`, añade al `MatchingService` un método que reciba el repo de conversaciones. Para no romper la firma actual del constructor, añade un parámetro opcional:
 
@@ -1484,7 +1517,7 @@ y el método (usa el schema `ConversationResponse` ya existente en `app.schemas`
 
 > Devuelve el modelo `Conversation`; el endpoint lo serializa con el `response_model` del schema de conversación existente (el mismo que usa `GET /users/{id}/conversations`).
 
-- [ ] **Step 4: Añadir el endpoint**
+- [x] **Step 4: Añadir el endpoint**
 
 En `backend/app/api/v1/matching.py`:
 1. Importa `get_conversation_repo`, `ConversationRepository`, y el schema de conversación existente (revisa `app/schemas` para el nombre; ej. `ConversationResponse`).
@@ -1501,12 +1534,12 @@ def connect_roommate(
     return svc.connect_roommate(user_id, target_id)
 ```
 
-- [ ] **Step 5: Correr toda la suite y verificar que pasa**
+- [x] **Step 5: Correr toda la suite y verificar que pasa** — verificado: 155 passed.
 
 Run: `cd backend && python -m pytest tests/ -v`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/api/v1/matching.py backend/app/services/matching.py backend/tests/test_matching_contact.py
@@ -1517,7 +1550,7 @@ git commit -m "feat(matching): endpoint connect crea conversacion directa entre 
 
 ## Task 16: Botón "Contactar" en la tarjeta de roommate (frontend)
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho y verificado E2E (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Modify: `frontend/src/features/matching/matching.service.ts`
@@ -1526,7 +1559,7 @@ git commit -m "feat(matching): endpoint connect crea conversacion directa entre 
 **Interfaces:**
 - Produces: `connectRoommate(id: number): Promise<Conversation>` en el servicio; botón "Contactar" en cada tarjeta que, al éxito, navega al chat existente.
 
-- [ ] **Step 1: Añadir la llamada al servicio**
+- [x] **Step 1: Añadir la llamada al servicio** — `matchingService.connectRoommate(targetId)` (POST vía `apiRequest`).
 
 En `frontend/src/features/matching/matching.service.ts`:
 
@@ -1536,15 +1569,15 @@ export async function connectRoommate(targetId: number) {
 }
 ```
 
-- [ ] **Step 2: Botón en la tarjeta**
+- [x] **Step 2: Botón en la tarjeta** — botón "Contactar" con estado de carga/error por candidato; al éxito navega a `/account/messages` (la lista recarga y muestra la conversación).
 
 En `MatchingPage.tsx`, cada tarjeta de roommate añade un botón "Contactar" que llama `connectRoommate(match.user.id)` y, al éxito, navega a la vista de mensajería/chat existente con esa conversación.
 
-- [ ] **Step 3: Verificar manualmente**
+- [x] **Step 3: Verificar manualmente** — ✅ verificado E2E (2026-07-03): "Contactar" → `POST .../connect` 201 → navega a `/account/messages`; la conversación de roommate aparece sin propiedad. La idempotencia se validó también por HTTP directo (mismo `id` en 2 llamadas).
 
 Run: frontend + backend levantados. Como Ana, pulsa "Contactar" en un roommate → se crea la conversación y se navega al chat. Repetir "Contactar" con el mismo → reutiliza la conversación (no duplica).
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add frontend/src/features/matching
@@ -1559,7 +1592,7 @@ git commit -m "feat(frontend): boton Contactar en tarjeta de roommate (contacto 
 
 ## Task 17: Modelo y repositorio de solicitudes de conexión
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho y verificado E2E (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
 
 **Files:**
 - Create: `backend/app/models/connection_request.py`
@@ -1573,7 +1606,7 @@ git commit -m "feat(frontend): boton Contactar en tarjeta de roommate (contacto 
   - `ConnectionRequest` (modelo): `id, from_id, to_id, status ('pending'|'accepted'|'rejected'), created_at`.
   - `ConnectionRequestRepository` (Protocol) + implementación en memoria: `create`, `get_incoming(user_id)`, `get_by_id`, `set_status`, `next_id`.
 
-- [ ] **Step 1: Escribir el test que falla**
+- [x] **Step 1: Escribir el test que falla**
 
 Añade a `backend/tests/test_matching_contact.py`:
 
@@ -1592,12 +1625,12 @@ class TestConnectionRequests:
         assert updated.status == "accepted"
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla**
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py::TestConnectionRequests -v`
 Expected: FAIL (módulos no existen).
 
-- [ ] **Step 3: Crear el modelo**
+- [x] **Step 3: Crear el modelo**
 
 Crea `backend/app/models/connection_request.py`:
 
@@ -1616,7 +1649,7 @@ class ConnectionRequest(BaseModel):
     created_at: str
 ```
 
-- [ ] **Step 4: Crear el repositorio en memoria**
+- [x] **Step 4: Crear el repositorio en memoria**
 
 Crea `backend/app/repositories/memory/connection_request.py`:
 
@@ -1650,19 +1683,19 @@ class MemoryConnectionRequestRepository:
         return req
 ```
 
-- [ ] **Step 5: Registrar en `__init__`, Protocol, `main.py` y `deps.py`**
+- [x] **Step 5: Registrar en `__init__`, Protocol, `main.py` y `deps.py`**
 
 - En `backend/app/repositories/memory/__init__.py`: exporta `MemoryConnectionRequestRepository`.
 - En `backend/app/repositories/base.py`: añade el Protocol `ConnectionRequestRepository` con las firmas de arriba.
 - En `backend/app/main.py`: en `lifespan`, añade `app.state.connection_request_repo = MemoryConnectionRequestRepository([])`.
 - En `backend/app/api/deps.py`: añade `get_connection_request_repo(request) -> ConnectionRequestRepository`.
 
-- [ ] **Step 6: Correr los tests y verificar que pasan**
+- [x] **Step 6: Correr los tests y verificar que pasan** — verificado (5 tests en test_matching_contact.py).
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py -v`
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/models/connection_request.py backend/app/repositories backend/app/main.py backend/app/api/deps.py backend/tests/test_matching_contact.py
@@ -1673,7 +1706,13 @@ git commit -m "feat(matching): modelo y repo de solicitudes de conexion (doble o
 
 ## Task 18: Endpoints de solicitud/aceptación y cambio del flujo `connect`
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho y verificado E2E (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
+
+> **Nota del ejecutor:** `accept_request` valida que solo el destinatario (`req.to_id == user_id`) pueda
+> aceptar/rechazar (devuelve 403 si no). Se **omitió la notificación** al destinatario (opcional); la bandeja
+> se consulta con `GET /matching/requests`. El endpoint `/connect` directo de la Fase 6 se mantiene (lo usa
+> internamente `accept_request`); en el frontend, el botón de la tarjeta ahora envía **solicitud** en lugar
+> de conectar directo.
 
 **Files:**
 - Modify: `backend/app/api/v1/matching.py`, `backend/app/services/matching.py`
@@ -1707,23 +1746,23 @@ class TestDoubleOptIn:
         assert 1 in acc.json()["participants"] and 3 in acc.json()["participants"]
 ```
 
-- [ ] **Step 2: Correr el test y verificar que falla**
+- [x] **Step 2: Correr el test y verificar que falla** (se añadieron también tests de rechazo, solo-destinatario y sin-auth)
 
 Run: `cd backend && python -m pytest tests/test_matching_contact.py::TestDoubleOptIn -v`
 Expected: FAIL con 404.
 
-- [ ] **Step 3: Implementar servicio + endpoints**
+- [x] **Step 3: Implementar servicio + endpoints**
 
 En `backend/app/services/matching.py`, añade métodos al servicio (inyectando el repo de solicitudes): `request_roommate(from_id, to_id)`, `list_incoming(user_id)`, `accept_request(user_id, req_id)` (valida que `user_id == req.to_id`, marca `accepted`, y llama `connect_roommate(req.from_id, req.to_id)`), `reject_request(user_id, req_id)`.
 
 En `backend/app/api/v1/matching.py`, añade los cuatro endpoints con sus `response_model`. Define en `schemas/matching.py` un `ConnectionRequestResponse(BaseSchema)` con `id, fromId, toId, status, createdAt`.
 
-- [ ] **Step 4: Correr toda la suite y verificar que pasa**
+- [x] **Step 4: Correr toda la suite y verificar que pasa** — verificado: 160 passed.
 
 Run: `cd backend && python -m pytest tests/ -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add backend/app/api/v1/matching.py backend/app/services/matching.py backend/app/schemas/matching.py backend/tests/test_matching_contact.py
@@ -1734,32 +1773,37 @@ git commit -m "feat(matching): flujo doble opt-in (solicitar, aceptar, rechazar)
 
 ## Task 19: UI de solicitudes (frontend)
 
-**Estado:** ⬜ Pendiente | **Responsable:** ____ | **Fecha:** ____
+**Estado:** ✅ Hecho y verificado E2E (commit pendiente del usuario) | **Responsable:** David | **Fecha:** 2026-07-03
+
+> **Nota del ejecutor:** el nombre/avatar del remitente en la bandeja se resuelve desde los roommates
+> conocidos (`userById` map), con fallback `Usuario #{id}` si no está en la lista. El rechazo es optimista
+> (quita la tarjeta al instante y recarga si falla la llamada). El estado del botón "Enviar solicitud" se
+> rastrea por candidato (`idle`/`sending`/`sent`/`error`).
 
 **Files:**
-- Modify: `frontend/src/features/matching/matching.service.ts`, `MatchingPage.tsx`
-- Create: componente/bandeja de solicitudes entrantes.
+- Modify: `frontend/src/features/matching/matching.service.ts`, `MatchingPage.tsx`, `types.ts`
+- Create: bandeja de solicitudes entrantes (integrada en `MatchingPage.tsx`).
 
 **Interfaces:**
 - Produces: en `matching.service.ts` — `requestRoommate(id)`, `getIncomingRequests()`, `acceptRequest(id)`, `rejectRequest(id)`. En la UI, el botón "Contactar" ahora envía **solicitud**; una bandeja muestra solicitudes entrantes con Aceptar/Rechazar.
 
-- [ ] **Step 1: Añadir las 4 llamadas al servicio**
+- [x] **Step 1: Añadir las 4 llamadas al servicio** — `requestRoommate`, `getIncomingRequests`, `acceptRequest`, `rejectRequest` + tipo `ConnectionRequest` en `types.ts`.
 
 En `matching.service.ts`, añade `requestRoommate`, `getIncomingRequests`, `acceptRequest`, `rejectRequest` (POST/GET a las rutas de la Task 18).
 
-- [ ] **Step 2: Cambiar "Contactar" por "Enviar solicitud"**
+- [x] **Step 2: Cambiar "Contactar" por "Enviar solicitud"** — el botón llama `requestRoommate` y muestra "✓ Solicitud enviada".
 
 En `MatchingPage.tsx`, el botón de la tarjeta de roommate ahora llama `requestRoommate(match.user.id)` y muestra estado "Solicitud enviada".
 
-- [ ] **Step 3: Bandeja de solicitudes entrantes**
+- [x] **Step 3: Bandeja de solicitudes entrantes** — sección "Solicitudes de contacto (N)" arriba de la página con Aceptar (→ navega a `/account/messages`) / Rechazar.
 
 Añade una sección/vista que liste `getIncomingRequests()` con botones Aceptar (llama `acceptRequest` → navega al chat creado) y Rechazar (`rejectRequest`).
 
-- [ ] **Step 4: Verificar manualmente el flujo doble opt-in**
+- [x] **Step 4: Verificar manualmente el flujo doble opt-in** — ✅ verificado E2E (2026-07-03): Ana solicita a Valeria (`POST .../request` 201 → "Solicitud enviada"); Valeria ve la bandeja y al Aceptar (`POST .../requests/{id}/accept` 200) se crea la conversación y navega a Mensajes con Ana.
 
 Run: dos sesiones (Ana y Lucía). Ana envía solicitud a Lucía → Lucía la ve en su bandeja → acepta → se crea la conversación y ambas pueden chatear.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** (lo ejecuta el equipo humano)
 
 ```bash
 git add frontend/src/features/matching
@@ -1770,7 +1814,8 @@ git commit -m "feat(frontend): UI de solicitudes de roommate (doble opt-in)"
 
 ## Cierre
 
-- [ ] **Correr toda la suite backend:** `cd backend && python -m pytest tests/ -v` → todo verde.
-- [ ] **Type-check frontend:** `cd frontend && npx tsc --noEmit` → sin errores nuevos.
-- [ ] **Actualizar el tablero de fases** al inicio de este documento con el estado final.
-- [ ] **Actualizar el README** raíz: marcar la funcionalidad de IA de matching como implementada y enlazar el spec.
+- [x] **Correr toda la suite backend:** `cd backend && .venv/Scripts/python.exe -m pytest tests/ -q` → **160 passed**.
+- [x] **Type-check frontend:** `cd frontend && npx tsc --noEmit` → sin errores (además `vite build` OK).
+- [x] **Actualizar el tablero de fases** al inicio de este documento con el estado final (Fases 1–7 ✅).
+- [ ] **Actualizar el README** raíz: marcar la funcionalidad de IA de matching como implementada y enlazar el spec. — pendiente del equipo (junto con los commits).
+- [ ] **Commits** (los ejecuta el equipo humano): todo el trabajo de Fases 4–7 está en el working tree sin commitear. Ver los `git add`/`git commit` descritos en cada tarea.
