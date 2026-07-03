@@ -18,9 +18,18 @@ class Settings(BaseSettings):
 
     storage_backend: str = "memory"
 
+    # ── LLM (Groq, API compatible con OpenAI) ─────────────────────────────────
+    llm_api_key: str = ""                                   # GROQ_API_KEY / vacío = fallback
+    llm_base_url: str = "https://api.groq.com/openai/v1"
+    llm_model: str = "llama-3.1-8b-instant"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]
+
+    @property
+    def llm_enabled(self) -> bool:
+        return bool(self.llm_api_key)
 
 
 settings = Settings()
