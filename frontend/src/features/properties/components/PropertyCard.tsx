@@ -3,8 +3,6 @@ import { Heart, Star, MapPin, BadgeCheck, Clock } from 'lucide-react'
 import { cn } from '@/shared/utils/cn'
 import { formatCurrency } from '@/shared/utils/formatters'
 import { useFavoritesStore } from '@/core/store/favorites.store'
-import { useAuth } from '@/core/auth/useAuth'
-import { calcCompatibility, hasPreferences } from '../utils/compatibility'
 import type { Property, RoomType, AvailabilityStatus } from '../types/property.types'
 
 const ROOM_TYPE_LABELS: Record<RoomType, string> = {
@@ -20,24 +18,14 @@ const AVAILABILITY_CONFIG: Record<AvailabilityStatus, { label: string; className
   unavailable: { label: 'No disponible', className: 'bg-red-100 text-red-600' },
 }
 
-function compatBadgeClass(score: number) {
-  if (score >= 70) return 'bg-green-500 text-white'
-  if (score >= 40) return 'bg-primary text-white'
-  return 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-}
-
 interface PropertyCardProps {
   property: Property
 }
 
 export const PropertyCard = ({ property }: PropertyCardProps) => {
   const { toggle, isFavorite } = useFavoritesStore()
-  const { user } = useAuth()
   const liked        = isFavorite(property.id)
   const availability = AVAILABILITY_CONFIG[property.availabilityStatus]
-
-  const prefs = user?.lifestylePreferences
-  const compat = prefs && hasPreferences(prefs) ? calcCompatibility(prefs, property) : null
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
@@ -66,7 +54,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
 
         {/* Content */}
         <div className="p-4">
-          {/* Type + verified + compatibility badges */}
+          {/* Type + verified badges */}
           <div className="mb-2 flex flex-wrap items-center gap-1.5">
             <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary/10 dark:text-primary">
               {ROOM_TYPE_LABELS[property.roomType]}
@@ -77,22 +65,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
                 Verificado
               </span>
             )}
-            {compat && compat.score > 0 && (
-              <span
-                title={compat.reasons.join(' · ')}
-                className={cn('cursor-help rounded-full px-2.5 py-0.5 text-xs font-semibold', compatBadgeClass(compat.score))}
-              >
-                {compat.score}% compatible
-              </span>
-            )}
           </div>
-
-          {/* Compatibility reasons */}
-          {compat && compat.reasons.length > 0 && (
-            <p className="mb-1.5 mt-0.5 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
-              {compat.reasons.join(' · ')}
-            </p>
-          )}
 
           {/* Title */}
           <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-gray-900 dark:text-white">

@@ -39,6 +39,11 @@ export const Navbar = () => {
           <Link to="/recommendations" className="text-sm font-medium text-secondary transition-colors hover:text-primary dark:text-secondary-300 dark:hover:text-primary">
             Recomendaciones
           </Link>
+          {isAuthenticated && (
+            <Link to="/matching" className="text-sm font-medium text-secondary transition-colors hover:text-primary dark:text-secondary-300 dark:hover:text-primary">
+              Para ti
+            </Link>
+          )}
         </nav>
 
         {/* Right side */}

@@ -28,6 +28,9 @@ import { PreferencesPage } from '@/features/account/pages/PreferencesPage'
 // Recommendations
 import { RecommendationsPage } from '@/features/recommendations/pages/RecommendationsPage'
 
+// Matching (IA)
+import { MatchingPage } from '@/features/matching/MatchingPage'
+
 // Host pages
 import { HostDashboardPage } from '@/features/host/pages/HostDashboardPage'
 import { HostPropertiesPage } from '@/features/host/pages/HostPropertiesPage'
@@ -80,6 +83,14 @@ export const router = createBrowserRouter([
         ],
       },
       { path: 'recommendations', element: <RecommendationsPage /> },
+      {
+        path: 'matching',
+        element: (
+          <ProtectedRoute>
+            <MatchingPage />
+          </ProtectedRoute>
+        ),
+      },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

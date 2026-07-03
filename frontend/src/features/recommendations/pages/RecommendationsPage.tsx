@@ -4,11 +4,9 @@ import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react'
 import { UniversityCombobox } from '@/shared/components/ui/UniversityCombobox'
 import { PropertyCard } from '@/features/properties/components/PropertyCard'
 import { propertyService } from '@/features/properties/services/property.service'
-import { calcCompatibility } from '@/features/properties/utils/compatibility'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
 import type { Property, RoomType } from '@/features/properties/types/property.types'
-import type { LifestylePreferences } from '@/features/account/types/account.types'
 
 // ─── Step definitions ────────────────────────────────────────────────────────
 
@@ -28,7 +26,7 @@ export const RecommendationsPage = () => {
   const navigate = useNavigate()
   const [step,     setStep]     = useState<Step>(0)
   const [loading,  setLoading]  = useState(false)
-  const [results,  setResults]  = useState<{ property: Property; score: number; reasons: string[] }[]>([])
+  const [results,  setResults]  = useState<Property[]>([])
   const [showResults, setShowResults] = useState(false)
 
   const [university,  setUniversity]  = useState('')
@@ -52,17 +50,6 @@ export const RecommendationsPage = () => {
 
   const handleSearch = async () => {
     setLoading(true)
-    const prefs: LifestylePreferences = {
-      targetUniversity: university,
-      maxMonthlyBudget: budget,
-      sleepSchedule:    sleepSched,
-      studyHabits:      studyHabits,
-      noiseLevel:       noiseLevel,
-      cleanliness:      '',
-      guestsPolicy:     '',
-      smokingPolicy:    '',
-      petsPolicy:       '',
-    }
 
     const all = await propertyService.search({
       nearestUniversity: university || undefined,
@@ -70,14 +57,7 @@ export const RecommendationsPage = () => {
       maxPricePerMonth:  budget,
     })
 
-    const scored = all
-      .map(p => {
-        const { score, reasons } = calcCompatibility(prefs, p)
-        return { property: p, score, reasons }
-      })
-      .sort((a, b) => b.score - a.score)
-
-    setResults(scored)
+    setResults(all)
     setLoading(false)
     setShowResults(true)
   }
@@ -94,7 +74,7 @@ export const RecommendationsPage = () => {
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">Tus espacios recomendados</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{results.length} espacios ordenados por compatibilidad</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{results.length} espacios según tus criterios</p>
           </div>
         </div>
 
@@ -104,26 +84,19 @@ export const RecommendationsPage = () => {
             <Button variant="outline" className="mt-4" onClick={() => setShowResults(false)}>Ajustar búsqueda</Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {results.map(({ property, score, reasons }) => (
-              <div key={property.id} className="relative">
-                <PropertyCard property={property} />
-                {score > 0 && (
-                  <div className="absolute bottom-16 left-3 right-3">
-                    <span className={cn(
-                      'rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm',
-                      score >= 70 ? 'bg-green-500 text-white' : score >= 40 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                    )}>
-                      {score}% compatible
-                    </span>
-                    {reasons.length > 0 && (
-                      <p className="mt-1 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">{reasons.join(' · ')}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="mb-6 rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-3 text-sm text-primary-700 dark:border-primary/20 dark:bg-primary/5 dark:text-primary">
+              💡 ¿Quieres tu porcentaje de compatibilidad y roommates ideales?{' '}
+              <button onClick={() => navigate('/matching')} className="font-semibold underline hover:no-underline">
+                Ve a “Para ti”
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {results.map(property => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     )
