@@ -28,7 +28,10 @@ Funcionalidad que rankea habitaciones y roommates compatibles para cada estudian
 - Endpoints: `GET /api/v1/matching/properties`, `GET /api/v1/matching/roommates`, `POST /api/v1/matching/roommates/{id}/request`, `GET /api/v1/matching/requests`, `POST /api/v1/matching/requests/{id}/accept|reject`.
 
 Configuración del LLM (opcional) en `backend/.env` — ver `backend/.env.example`:
-`LLM_API_KEY`, `LLM_BASE_URL` (por defecto Groq), `LLM_MODEL`. Sin key, se usa la explicación por plantilla.
+`LLM_API_KEY_ROOMMATES` (roommates; acepta también el nombre antiguo `LLM_API_KEY`/`GROQ_API_KEY`),
+`LLM_API_KEY_ROOMS` (habitaciones; si está vacío cae a la key de roommates), `LLM_BASE_URL`
+(por defecto Groq) y `LLM_MODEL`. Cada dominio usa su propia key para repartir el rate limit de
+Groq. Sin key en un dominio, se usa la explicación por plantilla en ese dominio.
 
 Diseño y plan de implementación: ver la tabla de [Documentación](#documentación).
 
