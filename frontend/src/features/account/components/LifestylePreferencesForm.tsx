@@ -67,10 +67,14 @@ export const LifestylePreferencesForm = ({
             {prefs.maxMonthlyBudget > 0 ? `S/ ${prefs.maxMonthlyBudget.toLocaleString()}` : 'Sin definir'}
           </span>
         </div>
+        {/* Cuando el presupuesto está sin definir (0), el thumb se ancla en el
+            mínimo para que la posición visual no sugiera un valor que no se
+            guardaría. Se define en cuanto el usuario mueve el control. */}
         <input type="range" min={200} max={3000} step={50}
-          value={prefs.maxMonthlyBudget || 1000}
+          value={prefs.maxMonthlyBudget || 200}
           onChange={e => set('maxMonthlyBudget', Number(e.target.value))}
-          className="h-2 w-full cursor-pointer accent-orange-500" />
+          className="h-2 w-full cursor-pointer accent-orange-500"
+          style={prefs.maxMonthlyBudget > 0 ? undefined : { opacity: 0.5 }} />
         <div className="mt-1 flex justify-between text-xs text-gray-400">
           <span>S/ 200</span><span>S/ 3,000</span>
         </div>
