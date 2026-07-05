@@ -15,13 +15,12 @@ interface AuthState {
 
 export const AuthContext = createContext<AuthState | null>(null)
 
-const USER_CACHE_KEY = 'nextu_user'
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Hidratación: si hay token, validarlo contra /auth/me y restaurar sesión
+  // Hidratación: si hay token, validarlo contra /auth/me y restaurar sesión.
+  // /auth/me es la única fuente de verdad del usuario (incluye preferencias).
   useEffect(() => {
     const token = getAccessToken()
     if (!token) {
@@ -29,33 +28,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return
     }
     authService.me()
-      .then(authUser => {
-        setUser(authUser)
-        localStorage.setItem(USER_CACHE_KEY, JSON.stringify(authUser))
-      })
-      .catch(() => {
-        clearTokens()
-        localStorage.removeItem(USER_CACHE_KEY)
-      })
+      .then(setUser)
+      .catch(() => clearTokens())
       .finally(() => setIsLoading(false))
   }, [])
 
   const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
     const authUser = await authService.login(email, password)
     setUser(authUser)
-    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(authUser))
     return authUser
   }, [])
 
   const logout = useCallback(() => {
     setUser(null)
-    localStorage.removeItem(USER_CACHE_KEY)
     authService.logout()
   }, [])
 
   const setAuthUser = useCallback((updatedUser: AuthUser) => {
     setUser(updatedUser)
-    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(updatedUser))
   }, [])
 
   return (

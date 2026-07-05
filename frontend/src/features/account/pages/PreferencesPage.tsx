@@ -36,7 +36,7 @@ export const PreferencesPage = () => {
 
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <LifestylePreferencesForm
-          initial={(user as { lifestylePreferences?: LifestylePreferences })?.lifestylePreferences}
+          initial={user?.lifestylePreferences}
           onSave={handleSave}
           loading={loading}
         />
