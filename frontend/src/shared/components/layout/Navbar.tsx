@@ -39,7 +39,9 @@ export const Navbar = () => {
           <Link to="/recommendations" className="text-sm font-medium text-secondary transition-colors hover:text-primary dark:text-secondary-300 dark:hover:text-primary">
             Recomendaciones
           </Link>
-          {isAuthenticated && (
+          {/* El matching (roommates/habitaciones por afinidad) es para inquilinos;
+              un host puro no tiene perfil de convivencia con el que comparar. */}
+          {isAuthenticated && user?.role !== 'host' && (
             <Link to="/matching" className="text-sm font-medium text-secondary transition-colors hover:text-primary dark:text-secondary-300 dark:hover:text-primary">
               Para ti
             </Link>
