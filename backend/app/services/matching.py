@@ -23,7 +23,7 @@ from app.schemas.review import ConversationResponse, MessageResponse, Participan
 from app.models.conversation import Conversation
 from app.models.connection_request import ConnectionRequest
 from app.core.exceptions import conflict, not_found, forbidden
-from app.services.ai_explainer import explain
+from app.services.ai_explainer import explain, ROOM, ROOMMATE
 
 
 @dataclass(frozen=True)
@@ -225,7 +225,7 @@ class MatchingService:
             matches.append(PropertyMatchResponse(
                 property=_enrich_property(prop, self._reviews),
                 score=bd.score, reasons=bd.reasons, dimensions=bd.dimensions,
-                explanation=explain(f"la habitación '{prop.title}'", bd.reasons),
+                explanation=explain(f"la habitación '{prop.title}'", bd.reasons, domain=ROOM),
             ))
         matches.sort(key=lambda m: m.score, reverse=True)
         return matches
@@ -241,7 +241,7 @@ class MatchingService:
             matches.append(RoommateMatchResponse(
                 user=_auth_user(other),
                 score=bd.score, reasons=bd.reasons, dimensions=bd.dimensions,
-                explanation=explain(f"el/la compañero(a) {other.first_name}", bd.reasons),
+                explanation=explain(f"el/la compañero(a) {other.first_name}", bd.reasons, domain=ROOMMATE),
             ))
         matches.sort(key=lambda m: m.score, reverse=True)
         return matches

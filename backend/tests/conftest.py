@@ -19,13 +19,15 @@ from app.main import app
 def _disable_llm_in_tests(monkeypatch):
     """
     Los tests nunca deben llamar al LLM real (sería lento, con costo y no
-    determinista). Se fuerza el fallback por plantilla aunque exista una
-    LLM_API_KEY / GROQ_API_KEY en el entorno o en backend/.env. Los tests de
-    ai_explainer que ejercen la ruta del LLM la habilitan localmente con su
-    propio patch (cliente mockeado), así que este fixture no los afecta.
+    determinista). Se fuerza el fallback por plantilla en ambos dominios
+    (roommates y habitaciones) aunque existan keys en el entorno o en
+    backend/.env. Los tests de ai_explainer que ejercen la ruta del LLM la
+    habilitan localmente con su propio patch (cliente mockeado), así que este
+    fixture no los afecta.
     """
     from app.services import ai_explainer
-    monkeypatch.setattr(ai_explainer.settings, "llm_api_key", "")
+    monkeypatch.setattr(ai_explainer.settings, "llm_api_key_roommates", "")
+    monkeypatch.setattr(ai_explainer.settings, "llm_api_key_rooms", "")
 
 
 # ── Cliente HTTP ─────────────────────────────────────────────────────────────
