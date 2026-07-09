@@ -118,7 +118,7 @@ export const AdvancedFilters = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2 className="text-base font-bold text-gray-900">Filtros avanzados</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100">
+          <button type="button" onClick={onClose} aria-label="Cerrar filtros" className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -181,7 +181,7 @@ export const AdvancedFilters = ({
                   <input type="range" min={5} max={60} step={5} value={values.travelTime}
                     onChange={e => set('travelTime', Number(e.target.value))}
                     className="h-2 w-full cursor-pointer accent-orange-500" />
-                  <div className="flex justify-between text-xs text-gray-400">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>5 min</span><span>60 min</span>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export const AdvancedFilters = ({
                     value={values.maxPrice ?? 3000}
                     onChange={e => set('maxPrice', Number(e.target.value))}
                     className="h-2 w-full cursor-pointer accent-orange-500" />
-                  <div className="flex justify-between text-xs text-gray-400">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>S/ 200</span><span>S/ 3,000+</span>
                   </div>
                 </div>

@@ -56,8 +56,8 @@ export const PropertyBasicInfo = ({ property }: PropertyBasicInfoProps) => {
         {property.rating > 0 && (
           <span className="flex items-center gap-1">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <strong className="text-gray-900">{property.rating}</strong>
-            <span className="text-gray-400">({property.reviewsCount} reseñas)</span>
+            <strong className="text-gray-900 dark:text-white">{property.rating}</strong>
+            <span className="text-gray-500 dark:text-gray-400">({property.reviewsCount} reseñas)</span>
           </span>
         )}
       </div>
@@ -67,7 +67,7 @@ export const PropertyBasicInfo = ({ property }: PropertyBasicInfoProps) => {
         <span className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
         <span className="text-gray-500 dark:text-gray-400">/ mes</span>
         {property.pricePerNight > 0 && (
-          <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
+          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">({formatCurrency(property.pricePerNight)}/noche referencial)</span>
         )}
       </div>
 

@@ -9,6 +9,8 @@ import type { Property, BookingDraft } from '../types/property.types'
 interface PropertyBookingCardProps {
   property: Property
   onBook: (draft: BookingDraft) => void
+  /** Sin marco propio (sticky/borde/sombra) para incrustarla dentro de un modal. */
+  bare?: boolean
 }
 
 const DURATION_OPTIONS = [1, 2, 3, 6, 12]
@@ -20,7 +22,7 @@ const nextMonths = Array.from({ length: 6 }, (_, i) => {
   return d.toISOString().slice(0, 7)
 })
 
-export const PropertyBookingCard = ({ property, onBook }: PropertyBookingCardProps) => {
+export const PropertyBookingCard = ({ property, onBook, bare = false }: PropertyBookingCardProps) => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [startMonth,     setStartMonth]     = useState(nextMonths[0])
@@ -41,7 +43,9 @@ export const PropertyBookingCard = ({ property, onBook }: PropertyBookingCardPro
   }
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-gray-700 dark:bg-gray-800">
+    <div className={bare
+      ? ''
+      : 'sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800'}>
       {/* Monthly price */}
       <div className="mb-4 flex items-baseline gap-1">
         <span className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>

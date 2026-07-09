@@ -14,7 +14,7 @@ interface SuccessModalProps {
 }
 
 export const SuccessModal = ({ open, onClose, propertyTitle, totalAmount, startMonth, durationMonths }: SuccessModalProps) => (
-  <Modal open={open} onClose={onClose} size="sm">
+  <Modal open={open} onClose={onClose} size="sm" ariaLabel="Reserva confirmada">
     <div className="flex flex-col items-center gap-4 py-4 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
         <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />

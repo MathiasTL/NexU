@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-08",
+  "title": "Design System: NexU",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Naranja Bienvenida",
+        "canonical": "#E8813A",
+        "tonalRamp": ["#5C2C04", "#7C3C08", "#A5500F", "#C96920", "#E8813A", "#F8A87A", "#FBCAA6", "#FEF3EA"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Azul Confianza",
+        "canonical": "#1A3C6E",
+        "tonalRamp": ["#050F1E", "#091830", "#0F2447", "#1A3C6E", "#2A5CA3", "#4A7BC3", "#7EA2DC", "#EEF3FC"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#111827",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#E5E7EB", "#F9FAFB"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Títulos de página y hero de sección." },
+      "body": { "displayName": "Body", "purpose": "Texto general; cap 65–75ch en prosa larga." },
+      "label": { "displayName": "Label", "purpose": "Metadatos, badges, chips, texto auxiliar." }
+    },
+    "shadows": [
+      { "name": "card-rest", "value": "0 1px 2px 0 rgba(0,0,0,0.05)", "purpose": "Reposo de tarjeta (shadow-sm)." },
+      { "name": "card-hover", "value": "0 4px 6px -1px rgba(0,0,0,0.1)", "purpose": "Hover de tarjeta (shadow-md)." },
+      { "name": "floating", "value": "0 20px 25px -5px rgba(0,0,0,0.1)", "purpose": "Dropdowns y menús flotantes (shadow-xl)." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Transiciones de color/estado por defecto." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal cálida; dosificada por pantalla.",
+      "html": "<button class=\"ds-btn-primary\">Reservar</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: #E8813A; color: #fff; font-weight: 500; font-size: 0.875rem; padding: 0.625rem 1rem; border: none; border-radius: 0.75rem; transition: background-color 0.2s cubic-bezier(0.4,0,0.2,1); cursor: pointer; } .ds-btn-primary:hover { background: #C96920; } .ds-btn-primary:focus-visible { outline: 2px solid #E8813A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Acción secundaria contenida.",
+      "html": "<button class=\"ds-btn-outline\">Ver detalle</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: #fff; color: #374151; font-weight: 500; font-size: 0.875rem; padding: 0.625rem 1rem; border: 1px solid #D1D5DB; border-radius: 0.75rem; transition: background-color 0.2s; cursor: pointer; } .ds-btn-outline:hover { background: #F9FAFB; } .ds-btn-outline:focus-visible { outline: 2px solid #E8813A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de formulario con foco naranja suave.",
+      "html": "<input class=\"ds-input\" placeholder=\"Buscar por universidad\" />",
+      "css": ".ds-input { width: 100%; background: #fff; color: #111827; font-size: 0.875rem; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.75rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; } .ds-input::placeholder { color: #9CA3AF; } .ds-input:focus { border-color: #E8813A; box-shadow: 0 0 0 2px rgba(232,129,58,0.2); }"
+    },
+    {
+      "name": "Badge / Chip",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Estado y etiqueta; nunca solo color, siempre con texto.",
+      "html": "<span class=\"ds-badge\">Disponible</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; background: #DCFCE7; color: #166534; font-size: 0.75rem; font-weight: 500; padding: 0.125rem 0.625rem; border-radius: 9999px; }"
+    },
+    {
+      "name": "Property Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Tarjeta densa: imagen, tipo, título, ubicación, distancia al campus, precio y rating.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-body\"><span class=\"ds-card-tag\">Habitación</span><h3 class=\"ds-card-title\">Habitación amoblada a 8 min de la PUCP</h3><div class=\"ds-card-meta\">San Miguel · 8 min de PUCP</div><div class=\"ds-card-foot\"><span class=\"ds-card-price\">S/ 850 <small>/ mes</small></span><span class=\"ds-card-rating\">★ 4.8</span></div></div></div>",
+      "css": ".ds-card { overflow: hidden; background: #fff; border: 1px solid #F3F4F6; border-radius: 1rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); transition: box-shadow 0.2s; } .ds-card:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); } .ds-card-body { padding: 1rem; } .ds-card-tag { display: inline-block; background: #FEF3EA; color: #C96920; font-size: 0.75rem; font-weight: 500; padding: 0.125rem 0.625rem; border-radius: 9999px; } .ds-card-title { margin: 0.5rem 0 0.375rem; font-size: 0.875rem; font-weight: 600; line-height: 1.375; color: #111827; } .ds-card-meta { font-size: 0.75rem; color: #6B7280; } .ds-card-foot { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 0.75rem; } .ds-card-price { font-size: 1rem; font-weight: 700; color: #111827; } .ds-card-price small { font-size: 0.75rem; font-weight: 400; color: #6B7280; } .ds-card-rating { font-size: 0.875rem; font-weight: 500; color: #374151; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Conserje de Confianza",
+    "overview": "NexU es la herramienta que ordena el caos de buscar dónde vivir en la universidad. La interfaz se comporta como un buen conserje: cálida al recibir, clara al señalar, y sólida cuando importa. El naranja es el gesto de bienvenida y el azul marino es el respaldo que da seguridad. El sistema es denso pero respirado, y prioriza reducir ansiedad sobre empujar el CTA.",
+    "keyCharacteristics": [
+      "Naranja cálido de acción + azul marino de confianza, sobre lienzo blanco/limpio.",
+      "Una sola familia (Inter) en varios pesos; jerarquía por tamaño y peso.",
+      "Redondeo suave y generoso, sombras mínimas que aparecen en estado.",
+      "Móvil de primera clase: nav inferior, targets amplios.",
+      "Dark mode completo con darkMode: 'class'."
+    ],
+    "rules": [
+      { "name": "La Regla del Naranja Medido", "body": "El naranja de marca es para acción y foco, no para baño de color. Su escasez es lo que lo hace leer como 'toca aquí'.", "section": "colors" },
+      { "name": "La Regla de Una Sola Voz Tipográfica", "body": "Inter en varios pesos, nunca una segunda familia. Para destacar, sube peso o tamaño.", "section": "typography" },
+      { "name": "La Regla Plano-por-Defecto", "body": "Las tarjetas están planas en reposo; la sombra es respuesta al estado, nunca decoración fija.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar el naranja para acción y foco, dosificado.",
+      "Do apoyar la jerarquía en tamaño/peso de Inter, no en segundas fuentes.",
+      "Do mantener tarjetas planas en reposo; sombra solo en hover/flotante.",
+      "Do acompañar cada color de estado con texto/ícono (no solo tinte).",
+      "Do verificar contraste ≥4.5:1.",
+      "Do diseñar primero para móvil.",
+      "Do respetar prefers-reduced-motion en toda animación."
+    ],
+    "donts": [
+      "Don't caer en el look SaaS/plantilla AI.",
+      "Don't recargar con exceso juvenil.",
+      "Don't usar border-left/right >1px como franja de acento.",
+      "Don't combinar border 1px + box-shadow ancho como adorno fijo.",
+      "Don't redondear tarjetas más allá de 2xl.",
+      "Don't usar gradient text.",
+      "Don't anidar tarjetas.",
+      "Don't clonar literalmente Airbnb/Booking."
+    ]
+  }
+}

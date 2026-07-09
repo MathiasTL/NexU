@@ -165,12 +165,12 @@ export const PropertySearchMap = ({ properties }: PropertySearchMapProps) => {
                 <p className="line-clamp-2 text-xs font-semibold leading-snug text-gray-900">
                   {p.title}
                 </p>
-                <p className="mt-0.5 text-[11px] leading-snug text-gray-400">
+                <p className="mt-0.5 text-[11px] leading-snug text-gray-600">
                   {p.district} · {p.distanceToUniversityMinutes} min de {p.nearestUniversity}
                 </p>
                 <p className="mt-1.5 text-sm font-bold text-orange-600">
                   {formatCurrency(p.pricePerMonth)}
-                  <span className="text-[11px] font-normal text-gray-400">/mes</span>
+                  <span className="text-[11px] font-normal text-gray-500">/mes</span>
                 </p>
                 <Link
                   to={`/properties/${p.id}`}

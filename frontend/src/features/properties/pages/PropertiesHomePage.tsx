@@ -71,7 +71,7 @@ export const PropertiesHomePage = () => {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Busca por universidad, distrito o zona..."
-                className="w-full py-4 text-sm text-gray-900 outline-none placeholder:text-gray-400"
+                className="w-full py-4 text-sm text-gray-900 outline-none placeholder:text-gray-500"
               />
             </div>
             <button

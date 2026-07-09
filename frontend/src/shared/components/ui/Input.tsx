@@ -16,7 +16,7 @@ export const Input = ({ label, error, className, id, ...props }: InputProps) => 
     <input
       id={id}
       className={cn(
-        'rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400',
+        'rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-500',
         'focus:border-primary focus:ring-2 focus:ring-primary/20',
         'disabled:bg-gray-50',
         'dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:disabled:bg-gray-700',

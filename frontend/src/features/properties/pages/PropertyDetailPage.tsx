@@ -15,6 +15,7 @@ import { CheckoutModal } from '../components/CheckoutModal'
 import { SuccessModal } from '../components/SuccessModal'
 import { Spinner } from '@/shared/components/ui/Spinner'
 import { Button } from '@/shared/components/ui/Button'
+import { Modal } from '@/shared/components/ui/Modal'
 import { formatCurrency } from '@/shared/utils/formatters'
 import type { Property, BookingDraft } from '../types/property.types'
 
@@ -26,8 +27,10 @@ export const PropertyDetailPage = () => {
   const [loading,        setLoading]        = useState(true)
   const [draft,          setDraft]          = useState<BookingDraft | null>(null)
   const [checkoutOpen,   setCheckoutOpen]   = useState(false)
+  const [mobileBookOpen, setMobileBookOpen] = useState(false)
   const [successOpen,    setSuccessOpen]    = useState(false)
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [bookingError,   setBookingError]   = useState<string | null>(null)
   const [confirmedTotal, setConfirmedTotal] = useState(0)
 
   useEffect(() => {
@@ -41,38 +44,40 @@ export const PropertyDetailPage = () => {
 
   const handleBook = (d: BookingDraft) => {
     setDraft(d)
+    setBookingError(null)
+    setMobileBookOpen(false)
     setCheckoutOpen(true)
-  }
-
-  const handleMobileBook = () => {
-    const start = new Date()
-    start.setDate(1)
-    handleBook({ startMonth: start.toISOString().slice(0, 7), durationMonths: 1, residentCount: 1 })
   }
 
   const handleConfirm = async (message: string) => {
     if (!property || !draft || !user) return
     setBookingLoading(true)
+    setBookingError(null)
     const subtotal   = property.pricePerMonth * draft.durationMonths
     const serviceFee = Math.round(subtotal * 0.14)
     const total      = subtotal + serviceFee
-    await bookingService.create({
-      propertyId:    property.id,
-      tenantId:      user.id,
-      hostId:        property.hostId,
-      startMonth:    draft.startMonth,
-      durationMonths: draft.durationMonths,
-      residentCount: draft.residentCount,
-      pricePerMonth: property.pricePerMonth,
-      serviceFee,
-      totalAmount:   total,
-      currency:      'PEN',
-      guestMessage:  message || undefined,
-    })
-    setConfirmedTotal(total)
-    setBookingLoading(false)
-    setCheckoutOpen(false)
-    setSuccessOpen(true)
+    try {
+      await bookingService.create({
+        propertyId:    property.id,
+        tenantId:      user.id,
+        hostId:        property.hostId,
+        startMonth:    draft.startMonth,
+        durationMonths: draft.durationMonths,
+        residentCount: draft.residentCount,
+        pricePerMonth: property.pricePerMonth,
+        serviceFee,
+        totalAmount:   total,
+        currency:      'PEN',
+        guestMessage:  message || undefined,
+      })
+      setConfirmedTotal(total)
+      setCheckoutOpen(false)
+      setSuccessOpen(true)
+    } catch {
+      setBookingError('No pudimos enviar tu solicitud. Revisa tu conexión e inténtalo de nuevo; no se realizó ningún cargo.')
+    } finally {
+      setBookingLoading(false)
+    }
   }
 
   if (loading) return (
@@ -126,10 +131,15 @@ export const PropertyDetailPage = () => {
           <p className="text-xs text-gray-500 dark:text-gray-400">por mes</p>
           <span className="text-xl font-bold text-gray-900 dark:text-white">{formatCurrency(property.pricePerMonth)}</span>
         </div>
-        <Button onClick={handleMobileBook} disabled={isUnavailable}>
+        <Button onClick={() => setMobileBookOpen(true)} disabled={isUnavailable}>
           {isUnavailable ? 'No disponible' : 'Reservar ahora'}
         </Button>
       </div>
+
+      {/* Selección de reserva en móvil — el usuario elige inicio, duración y residentes */}
+      <Modal open={mobileBookOpen} onClose={() => setMobileBookOpen(false)} title="Elige tu reserva" size="md">
+        <PropertyBookingCard property={property} onBook={handleBook} bare />
+      </Modal>
 
       {draft && (
         <CheckoutModal
@@ -139,6 +149,7 @@ export const PropertyDetailPage = () => {
           draft={draft}
           onConfirm={handleConfirm}
           loading={bookingLoading}
+          error={bookingError}
         />
       )}
 

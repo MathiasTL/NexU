@@ -24,3 +24,31 @@ body {
   outline: 2px solid #E8813A;
   outline-offset: 2px;
 }
+
+/*
+ * Respeto de prefers-reduced-motion (WCAG 2.3.3).
+ * Neutraliza transiciones, animaciones y scroll suave para quienes lo piden,
+ * sin desactivar la interfaz: los cambios de estado siguen ocurriendo, pero
+ * de forma instantánea en vez de animada. Los spinners conservan su giro
+ * porque comunican progreso (indicador funcional, no decoración).
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  /* El spinner de carga sí debe seguir girando: comunica que algo pasa. */
+  .animate-spin {
+    animation-duration: 0.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

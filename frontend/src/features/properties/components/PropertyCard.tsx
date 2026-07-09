@@ -94,7 +94,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
               <div className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{property.rating}</span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">({property.reviewsCount})</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">({property.reviewsCount})</span>
               </div>
             )}
           </div>
